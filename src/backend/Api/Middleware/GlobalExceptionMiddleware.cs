@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Application.Exceptions;
 using Api.DTOs;
 
 namespace Api.Middleware;
@@ -20,10 +21,18 @@ public sealed class GlobalExceptionMiddleware(ILogger<GlobalExceptionMiddleware>
                 ? new[] { exception.Message, exception.StackTrace ?? string.Empty }
                 : new[] { "An unexpected error occurred." };
 
-            var response = ApiResponse<object>.Fail("Internal server error.", errors);
+            var (statusCode, message) = exception switch
+            {
+                AppValidationException validationException => (HttpStatusCode.BadRequest, validationException.Message),
+                UnauthorizedException unauthorizedException => (HttpStatusCode.Unauthorized, unauthorizedException.Message),
+                NotFoundException notFoundException => (HttpStatusCode.NotFound, notFoundException.Message),
+                _ => (HttpStatusCode.InternalServerError, "Internal server error.")
+            };
+
+            var response = ApiResponse<object>.Fail(message, statusCode == HttpStatusCode.InternalServerError ? errors : null);
             var json = JsonSerializer.Serialize(response);
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)statusCode;
             context.Response.ContentType = "application/json";
 
             await context.Response.WriteAsync(json);

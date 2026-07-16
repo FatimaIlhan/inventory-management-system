@@ -10,7 +10,7 @@ builder.Logging.AddDebug();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddApiServices();
+builder.Services.AddApiServices(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var angularOrigin = builder.Configuration["Cors:AllowedOrigin"] ?? "http://localhost:4200";

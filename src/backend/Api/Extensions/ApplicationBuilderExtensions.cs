@@ -10,6 +10,7 @@ public static class ApplicationBuilderExtensions
         app.UseCors("AngularClient");
         app.UseMiddleware<Api.Middleware.GlobalExceptionMiddleware>();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

@@ -1,0 +1,21 @@
+<div class="shell">
+  <header>
+    <div class="brand">Inventory Management</div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      @if (isAdmin()) {
+        <a routerLink="/admin/users" routerLinkActive="active">Users</a>
+      }
+    </nav>
+
+    <div class="session">
+      <span>{{ currentUser()?.email }}</span>
+      <button type="button" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>

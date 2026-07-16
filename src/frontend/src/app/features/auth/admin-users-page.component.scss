@@ -1,0 +1,45 @@
+.users-page {
+  padding: 1.4rem;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(18, 41, 62, 0.08);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+form {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  max-width: 460px;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+input,
+select {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cad5e2;
+  border-radius: 10px;
+}
+
+button {
+  width: fit-content;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  background: #1767af;
+  color: #fff;
+  font-weight: 700;
+}
+
+.result {
+  margin: 0;
+  color: #1d4e2f;
+}

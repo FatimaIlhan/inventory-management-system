@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App {
+  constructor(private readonly authService: AuthService) {
+    this.authService.loadCurrentUser();
+  }
+
   protected readonly title = signal('Inventory Management System');
 }

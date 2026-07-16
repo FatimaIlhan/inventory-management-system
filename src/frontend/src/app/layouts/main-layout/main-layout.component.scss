@@ -1,0 +1,59 @@
+.shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f2f7fb 0%, #e8f0f8 100%);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.3rem;
+  background: #0f2740;
+  color: #f8fbff;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+a {
+  color: #d8e6f5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a.active {
+  color: #ffffff;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  background: #1f5ea8;
+  color: #fff;
+  cursor: pointer;
+}
+
+main {
+  padding: 1.2rem;
+}
+
+@media (max-width: 780px) {
+  header {
+    flex-wrap: wrap;
+  }
+}

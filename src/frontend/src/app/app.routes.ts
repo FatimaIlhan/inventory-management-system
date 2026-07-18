@@ -12,7 +12,14 @@ export const routes: Routes = [
 		path: 'auth',
 		component: AuthLayoutComponent,
 		children: [
-			{ path: 'login', component: LoginPageComponent },
+			{
+				path: 'login',
+				component: LoginPageComponent,
+				data: {
+					title: 'Sign In | Inventory Management System',
+					description: 'Secure login for inventory operations and role-based access.'
+				}
+			},
 			{ path: '', pathMatch: 'full', redirectTo: 'login' }
 		]
 	},
@@ -21,12 +28,23 @@ export const routes: Routes = [
 		component: MainLayoutComponent,
 		canActivate: [authGuard],
 		children: [
-			{ path: 'dashboard', component: DashboardPageComponent },
+			{
+				path: 'dashboard',
+				component: DashboardPageComponent,
+				data: {
+					title: 'Dashboard | Inventory Management System',
+					description: 'Overview of account and inventory operations status.'
+				}
+			},
 			{
 				path: 'admin/users',
 				component: AdminUsersPageComponent,
 				canActivate: [roleGuard],
-				data: { allowedRoles: ['Admin'] }
+				data: {
+					allowedRoles: ['Admin'],
+					title: 'User Administration | Inventory Management System',
+					description: 'Create and manage user accounts with role assignments.'
+				}
 			},
 			{ path: '', pathMatch: 'full', redirectTo: 'dashboard' }
 		]

@@ -22,8 +22,18 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.02em;
+}
+
+.brand-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .nav-links {
@@ -66,6 +76,10 @@ main {
 
   .brand {
     flex: 1 1 100%;
+  }
+
+  .brand-logo {
+    height: 30px;
   }
 
   .session {

@@ -34,6 +34,17 @@ mat-card-header {
   margin-bottom: 1rem;
 }
 
+.brand-mark {
+  margin-bottom: 0.2rem;
+}
+
+.logo {
+  display: block;
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
+
 mat-card-title {
   margin: 0;
   font-size: clamp(1.9rem, 1.65rem + 0.8vw, 2.3rem);
@@ -190,6 +201,10 @@ mat-form-field {
   .login-card {
     width: min(96vw, 440px);
     border-radius: 16px;
+  }
+
+  .logo {
+    height: 38px;
   }
 
   mat-card-title {

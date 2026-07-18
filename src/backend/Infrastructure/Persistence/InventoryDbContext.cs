@@ -7,6 +7,7 @@ namespace Infrastructure.Persistence;
 public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> options) : IdentityDbContext<User, Role, long>(options)
 {
 	public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+	public DbSet<Category> Categories => Set<Category>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

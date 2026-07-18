@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Persistence;
+using Infrastructure.Repositories;
 
 namespace Infrastructure.Configuration;
 
@@ -39,6 +40,7 @@ public static class DependencyInjection
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.Configure<SeedAdminOptions>(configuration.GetSection(SeedAdminOptions.SectionName));
         services.AddScoped<IAuthenticationService, IdentityAuthenticationService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         services.AddSingleton(TimeProvider.System);

@@ -1,24 +1,74 @@
-<section class="login-card">
-  <h1>Sign in</h1>
-  <p>Use your account to access inventory operations.</p>
+<section class="login-shell" aria-labelledby="login-title">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <p class="eyebrow">Secure access</p>
+      <mat-card-title id="login-title">Sign in</mat-card-title>
+      <mat-card-subtitle>Use your account to access inventory operations.</mat-card-subtitle>
+    </mat-card-header>
 
-  <form [formGroup]="loginForm" (ngSubmit)="submit()">
-    <label>
-      Email
-      <input type="email" formControlName="email" autocomplete="email" />
-    </label>
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          @if (emailControl.touched && emailControl.hasError('required')) {
+            <mat-error>Email is required.</mat-error>
+          }
+          @if (emailControl.touched && emailControl.hasError('email')) {
+            <mat-error>Enter a valid email address.</mat-error>
+          }
+        </mat-form-field>
 
-    <label>
-      Password
-      <input type="password" formControlName="password" autocomplete="current-password" />
-    </label>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="isPasswordVisible() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button
+            mat-button
+            matSuffix
+            type="button"
+            class="password-toggle"
+            [attr.aria-label]="isPasswordVisible() ? 'Hide password' : 'Show password'"
+            (click)="togglePasswordVisibility()"
+          >
+            @if (isPasswordVisible()) {
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M2.71 3.79a1 1 0 0 0-1.42 1.42l2.03 2.03C1.87 8.56.8 10.08.2 11.19a1.73 1.73 0 0 0 0 1.63C1.67 15.53 5.2 20 12 20c2.56 0 4.67-.63 6.39-1.61l2.9 2.9a1 1 0 1 0 1.42-1.42zM6.2 10.12l1.77 1.77a4 4 0 0 0 4.92 4.92l1.84 1.84A9.78 9.78 0 0 1 12 19c-6.12 0-9.2-4.02-10.04-6.18 0 0 1.15-1.95 4.24-2.7zm4.57-.47 4.58 4.58A4 4 0 0 0 10.77 9.65zm1.25-4.65c6.12 0 9.2 4.02 10.04 6.18-.39 1.01-1.36 2.63-3.43 3.83l-1.55-1.55a4 4 0 0 0-5.48-5.48L8.91 5.3A10.6 10.6 0 0 1 12.02 5z"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 5C5.2 5 1.67 9.47.2 11.18a1.73 1.73 0 0 0 0 1.64C1.67 14.53 5.2 19 12 19s10.33-4.47 11.8-6.18a1.73 1.73 0 0 0 0-1.64C22.33 9.47 18.8 5 12 5zm0 12c-5.72 0-8.63-3.65-9.58-5 .95-1.35 3.86-5 9.58-5s8.63 3.65 9.58 5c-.95 1.35-3.86 5-9.58 5zm0-8a3 3 0 1 0 3 3 3 3 0 0 0-3-3zm0 4a1 1 0 1 1 1-1 1 1 0 0 1-1 1z"
+                />
+              </svg>
+            }
+          </button>
+          @if (passwordControl.touched && passwordControl.hasError('required')) {
+            <mat-error>Password is required.</mat-error>
+          }
+          @if (passwordControl.touched && passwordControl.hasError('minlength')) {
+            <mat-error>Password must be at least 8 characters.</mat-error>
+          }
+        </mat-form-field>
 
-    @if (errorMessage()) {
-      <p class="error">{{ errorMessage() }}</p>
-    }
+        @if (errorMessage()) {
+          <p class="error" role="alert" aria-live="polite">{{ errorMessage() }}</p>
+        }
 
-    <button type="submit" [disabled]="isSubmitting()">
-      {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
-    </button>
-  </form>
+        <div class="form-actions">
+          <button mat-flat-button type="submit" class="submit-button" [disabled]="isSubmitting()">
+            <span class="button-label">{{ isSubmitting() ? 'Signing in...' : 'Sign in' }}</span>
+          </button>
+
+          <p class="form-note">Use your company account. Contact your administrator if you need access.</p>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </section>

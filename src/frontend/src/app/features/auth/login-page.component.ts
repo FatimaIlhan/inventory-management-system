@@ -1,12 +1,16 @@
 import { Component, signal, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss'
 })
@@ -17,11 +21,19 @@ export class LoginPageComponent {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly isPasswordVisible = signal(false);
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]]
   });
+
+  readonly emailControl = this.loginForm.controls.email;
+  readonly passwordControl = this.loginForm.controls.password;
+
+  togglePasswordVisibility(): void {
+    this.isPasswordVisible.update((value) => !value);
+  }
 
   async submit(): Promise<void> {
     if (this.loginForm.invalid) {

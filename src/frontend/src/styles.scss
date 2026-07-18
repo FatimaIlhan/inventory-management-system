@@ -1,4 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+	color-scheme: light;
+	--app-text: #10243b;
+	--app-bg: #edf3f8;
+	--app-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
 * {
 	box-sizing: border-box;
@@ -8,6 +13,22 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-	color: #10243b;
+	min-height: 100%;
+	font-family: var(--app-font);
+	color: var(--app-text);
+	background: var(--app-bg);
+}
+
+img,
+svg,
+video {
+	max-width: 100%;
+	height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+	font: inherit;
 }

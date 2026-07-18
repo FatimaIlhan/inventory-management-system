@@ -1,16 +1,20 @@
 .dashboard {
-  padding: 1.5rem;
   border-radius: 14px;
-  background: #ffffff;
   box-shadow: 0 10px 30px rgba(24, 44, 68, 0.08);
+  max-width: 720px;
 }
 
-h1 {
-  margin: 0 0 0.6rem;
+mat-card-title {
   color: #10243b;
 }
 
 p {
-  margin: 0.2rem 0;
+  margin: 0.2rem 0 0;
   color: #364f68;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    max-width: 100%;
+  }
 }

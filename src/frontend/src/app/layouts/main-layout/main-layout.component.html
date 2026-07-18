@@ -1,19 +1,19 @@
 <div class="shell">
-  <header>
+  <mat-toolbar class="topbar" [class.scrolled]="hasScrolled()">
     <div class="brand">Inventory Management</div>
 
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <nav class="nav-links">
+      <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
       @if (isAdmin()) {
-        <a routerLink="/admin/users" routerLinkActive="active">Users</a>
+        <a mat-button routerLink="/admin/users" routerLinkActive="active">Users</a>
       }
     </nav>
 
     <div class="session">
       <span>{{ currentUser()?.email }}</span>
-      <button type="button" (click)="logout()">Logout</button>
+      <button mat-stroked-button type="button" (click)="logout()">Logout</button>
     </div>
-  </header>
+  </mat-toolbar>
 
   <main>
     <router-outlet />

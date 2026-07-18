@@ -1,5 +1,9 @@
-<section class="dashboard">
-  <h1>Dashboard</h1>
-  <p>Welcome back, {{ currentUser()?.email }}.</p>
-  <p>Your role: <strong>{{ currentUser()?.role }}</strong></p>
-</section>
+<mat-card class="dashboard">
+  <mat-card-header>
+    <mat-card-title>Dashboard</mat-card-title>
+    <mat-card-subtitle>Welcome back, {{ currentUser()?.email }}.</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Your role: <strong>{{ currentUser()?.role }}</strong></p>
+  </mat-card-content>
+</mat-card>

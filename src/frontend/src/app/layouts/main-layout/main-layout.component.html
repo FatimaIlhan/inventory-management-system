@@ -1,24 +1,164 @@
-<div class="shell">
-  <mat-toolbar class="topbar" [class.scrolled]="hasScrolled()">
-    <div class="brand">
-      <img src="/images/logo.png" alt="Inventory Management System logo" class="brand-logo" />
-      <span>Inventory Management</span>
+<div class="app-shell" [class.sidebar-collapsed]="isSidebarCollapsed()" [class.mobile-sidebar-open]="isMobileSidebarOpen()">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button mat-icon-button type="button" class="icon-button mobile-toggle" (click)="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+
+      <a class="brand" routerLink="/dashboard" aria-label="Go to dashboard">
+        <img src="/images/logo.png" alt="Inventory Management System logo" class="brand-logo" />
+        <span>Inventory Management</span>
+      </a>
+
+      <button mat-icon-button type="button" class="icon-button desktop-toggle" (click)="toggleSidebarCollapse()" aria-label="Collapse navigation panel">
+        <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
     </div>
 
-    <nav class="nav-links">
-      <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      @if (isAdmin()) {
-        <a mat-button routerLink="/admin/users" routerLinkActive="active">Users</a>
-      }
-    </nav>
+    <div class="topbar-actions">
+      <button
+        mat-icon-button
+        type="button"
+        class="icon-button"
+        aria-label="Notifications"
+        matBadge="3"
+        matBadgeColor="accent"
+        matBadgeSize="small"
+      >
+        <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a5 5 0 0 0-5 5v2.5c0 .8-.3 1.6-.8 2.2L4.8 14a1 1 0 0 0 .8 1.6h12.8a1 1 0 0 0 .8-1.6l-1.4-1.3a3.5 3.5 0 0 1-.8-2.2V8a5 5 0 0 0-5-5zM10 18a2 2 0 1 0 4 0" />
+        </svg>
+      </button>
 
-    <div class="session">
-      <span>{{ currentUser()?.email }}</span>
-      <button mat-stroked-button type="button" (click)="logout()">Logout</button>
+      <button mat-icon-button type="button" class="icon-button" aria-label="Toggle compact mode">
+        <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
+        </svg>
+      </button>
+
+      <button mat-button type="button" class="profile-trigger" [matMenuTriggerFor]="profileMenu" aria-label="Open profile menu">
+        <span class="profile-avatar">AK</span>
+        <span class="profile-copy">
+          <strong>{{ profileName() }}</strong>
+          <small>{{ isAdmin() ? 'Admin' : 'Manager' }}</small>
+        </span>
+      </button>
+
+      <mat-menu #profileMenu="matMenu" class="profile-menu" xPosition="before">
+        <button mat-menu-item type="button">My Profile</button>
+        <button mat-menu-item type="button">Settings</button>
+        <button mat-menu-item type="button">Change Password</button>
+        <button mat-menu-item type="button" (click)="logout()">Logout</button>
+      </mat-menu>
     </div>
-  </mat-toolbar>
+  </header>
 
-  <main>
-    <router-outlet />
-  </main>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="sidebar-scroll">
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-item primary"
+          (click)="closeMobileSidebar()"
+        >
+          <span class="nav-icon" aria-hidden="true">
+            <svg class="nav-icon-svg" viewBox="0 0 24 24">
+              <path [attr.d]="getSidebarIconPath('dashboard')"></path>
+            </svg>
+          </span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+
+        <section class="nav-group">
+          <h3>MASTER DATA</h3>
+          @for (item of masterDataNav; track item.label) {
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
+              <span class="nav-icon" aria-hidden="true">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24">
+                  <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+                </svg>
+              </span>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </section>
+
+        <section class="nav-group">
+          <h3>INVENTORY</h3>
+          @for (item of inventoryNav; track item.label) {
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
+              <span class="nav-icon" aria-hidden="true">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24">
+                  <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+                </svg>
+              </span>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </section>
+
+        <section class="nav-group">
+          <h3>PURCHASE</h3>
+          @for (item of purchaseNav; track item.label) {
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
+              <span class="nav-icon" aria-hidden="true">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24">
+                  <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+                </svg>
+              </span>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </section>
+
+        <section class="nav-group">
+          <h3>REPORTS</h3>
+          @for (item of reportNav; track item.label) {
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
+              <span class="nav-icon" aria-hidden="true">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24">
+                  <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+                </svg>
+              </span>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </section>
+
+        <section class="nav-group">
+          <h3>SYSTEM</h3>
+          @for (item of systemNav; track item.label) {
+            @if (item.label !== 'Users' || isAdmin()) {
+              <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
+                <span class="nav-icon" aria-hidden="true">
+                  <svg class="nav-icon-svg" viewBox="0 0 24 24">
+                    <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+                  </svg>
+                </span>
+                <span class="nav-label">{{ item.label }}</span>
+              </a>
+            }
+          }
+        </section>
+      </div>
+
+      <button mat-stroked-button type="button" class="collapse-button" (click)="toggleSidebarCollapse()">
+        {{ isSidebarCollapsed() ? 'Expand' : 'Collapse' }}
+      </button>
+    </aside>
+
+    <main class="content-area">
+      <router-outlet />
+    </main>
+
+    @if (isMobileSidebarOpen()) {
+      <button type="button" class="mobile-overlay" (click)="closeMobileSidebar()" aria-label="Close navigation"></button>
+    }
+  </div>
 </div>

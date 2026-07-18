@@ -1,9 +1,155 @@
-<mat-card class="dashboard">
-  <mat-card-header>
-    <mat-card-title>Dashboard</mat-card-title>
-    <mat-card-subtitle>Welcome back, {{ currentUser()?.email }}.</mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <p>Your role: <strong>{{ currentUser()?.role }}</strong></p>
-  </mat-card-content>
-</mat-card>
+<section class="dashboard-page" aria-label="Inventory dashboard overview">
+  <header class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back, {{ displayName() }}! Here is what is happening with your inventory.</p>
+    </div>
+    <button mat-stroked-button type="button" class="date-range">May 18, 2024 - May 25, 2024</button>
+  </header>
+
+  <section class="stats-grid" aria-label="Top metrics">
+    @for (card of statCards; track card.title) {
+      <article class="stat-card" [attr.data-tone]="card.tone">
+        <div class="stat-icon" aria-hidden="true">
+          <svg class="stat-icon-svg" viewBox="0 0 24 24">
+            <path [attr.d]="getStatIconPath(card.icon)"></path>
+          </svg>
+        </div>
+        <div class="stat-copy">
+          <p class="stat-title">{{ card.title }}</p>
+          <p class="stat-value">{{ card.value }}</p>
+          <p class="stat-delta" [class.negative]="card.trend === 'down'">
+            {{ card.delta }} <span>from last month</span>
+          </p>
+        </div>
+      </article>
+    }
+  </section>
+
+  <section class="analytics-grid" aria-label="Analytics charts">
+    <article class="panel trend-panel">
+      <header class="panel-header">
+        <h2>Stock Movement Trend</h2>
+        <button mat-stroked-button type="button" class="panel-range">This Month</button>
+      </header>
+
+      <div class="legend" role="list">
+        <span role="listitem"><i class="line line-in"></i> Stock In</span>
+        <span role="listitem"><i class="line line-out"></i> Stock Out</span>
+        <span role="listitem"><i class="line line-adjust"></i> Adjustments</span>
+      </div>
+
+      <div class="chart-wrap" aria-hidden="true">
+        <svg viewBox="0 0 640 210" preserveAspectRatio="none">
+          <line x1="28" y1="24" x2="620" y2="24" class="grid" />
+          <line x1="28" y1="70" x2="620" y2="70" class="grid" />
+          <line x1="28" y1="116" x2="620" y2="116" class="grid" />
+          <line x1="28" y1="162" x2="620" y2="162" class="grid" />
+          <polyline points="28,126 126,104 224,92 322,55 420,84 518,98 620,88" class="series in" />
+          <polyline points="28,162 126,148 224,134 322,122 420,134 518,140 620,126" class="series out" />
+          <polyline points="28,183 126,183 224,175 322,183 420,177 518,172 620,176" class="series adjust" />
+        </svg>
+
+        <div class="x-axis" role="list">
+          @for (label of lineLabels; track label) {
+            <span role="listitem">{{ label }}</span>
+          }
+        </div>
+      </div>
+    </article>
+
+    <article class="panel category-panel">
+      <header class="panel-header">
+        <h2>Inventory by Category</h2>
+      </header>
+
+      <div class="donut-wrap">
+        <div class="donut" aria-hidden="true">
+          <div class="donut-inner">
+            <strong>1,248</strong>
+            <span>Total</span>
+          </div>
+        </div>
+
+        <div class="category-legend" role="list">
+          @for (category of categories; track category.name) {
+            <div role="listitem" class="legend-row">
+              <span class="dot" [style.background]="category.color"></span>
+              <span class="name">{{ category.name }}</span>
+              <strong>{{ category.percent }}%</strong>
+              <small>({{ category.count }})</small>
+            </div>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="tables-grid" aria-label="Operational tables">
+    <article class="panel table-panel">
+      <header class="panel-header">
+        <h2>Recent Activity</h2>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Reference</th>
+              <th>User</th>
+              <th>Date &amp; Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (activity of recentActivity; track activity.reference) {
+              <tr>
+                <td>
+                  <span class="activity-cell">
+                    <span class="activity-dot" [attr.data-type]="activity.type"></span>
+                    {{ activity.action }}
+                  </span>
+                </td>
+                <td>{{ activity.reference }}</td>
+                <td>{{ activity.user }}</td>
+                <td>{{ activity.dateTime }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <button mat-button type="button" class="table-cta">View all activity</button>
+    </article>
+
+    <article class="panel table-panel">
+      <header class="panel-header panel-header-split">
+        <h2>Low Stock Items</h2>
+        <button mat-button type="button" class="inline-link">View all</button>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Current Stock</th>
+              <th>Reorder Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of lowStockItems; track item.sku) {
+              <tr>
+                <td>{{ item.product }}</td>
+                <td>{{ item.sku }}</td>
+                <td><span class="stock-danger">{{ item.currentStock }}</span></td>
+                <td>{{ item.reorderLevel }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <button mat-button type="button" class="table-cta">View all low stock items</button>
+    </article>
+  </section>
+</section>

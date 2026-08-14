@@ -14,7 +14,7 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
 {
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<PagedResultDto<CategoryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPagedAsync(
+    public async Task<ActionResult> GetPagedAsync(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
@@ -26,7 +26,7 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
 
     [HttpGet("{categoryId:long}")]
     [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] long categoryId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetByIdAsync([FromRoute] long categoryId, CancellationToken cancellationToken)
     {
         var category = await categoryService.GetByIdAsync(categoryId, cancellationToken);
         return Ok(ApiResponse<CategoryDto>.Ok(category));
@@ -35,21 +35,28 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
     [HttpPost]
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> CreateAsync(
+    [FromBody] CreateCategoryRequest request,
+    CancellationToken cancellationToken)
     {
         var createdCategory = await categoryService.CreateAsync(
-            new CreateCategoryDto(request.Name, request.Description),
+            new CreateCategoryDto(
+                request.Name,
+                request.Description),
             cancellationToken);
 
-        return StatusCode(
-            StatusCodes.Status201Created,
-            ApiResponse<CategoryDto>.Ok(createdCategory, "Category created successfully."));
+        return CreatedAtAction(
+            nameof(GetByIdAsync),
+            new { categoryId = createdCategory.Id },
+            ApiResponse<CategoryDto>.Ok(
+                createdCategory,
+                "Category created successfully."));
     }
 
     [HttpPut("{categoryId:long}")]
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync(
+    public async Task<ActionResult> UpdateAsync(
         [FromRoute] long categoryId,
         [FromBody] UpdateCategoryRequest request,
         CancellationToken cancellationToken)
@@ -65,7 +72,7 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
     [HttpDelete("{categoryId:long}")]
     [Authorize(Policy = "ManagerOrAdmin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteAsync([FromRoute] long categoryId, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteAsync([FromRoute] long categoryId, CancellationToken cancellationToken)
     {
         await categoryService.DeleteAsync(categoryId, cancellationToken);
         return NoContent();

@@ -43,7 +43,12 @@ export class CategoriesPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
-  readonly displayedColumns = ['name', 'description', 'createdAtUtc', 'updatedAtUtc', 'actions'];
+  readonly canManageCategories = computed(() => this.authService.canAccessRole(['Admin', 'Manager']));
+  readonly displayedColumns = computed<string[]>(() =>
+    this.canManageCategories()
+      ? ['name', 'description', 'createdAtUtc', 'updatedAtUtc', 'actions']
+      : ['name', 'description', 'createdAtUtc', 'updatedAtUtc']
+  );
 
   readonly categories = signal<Category[]>([]);
   readonly totalCount = signal(0);
@@ -56,8 +61,6 @@ export class CategoriesPageComponent implements OnInit {
   readonly editingCategoryId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
   readonly pendingDeleteCategory = signal<Category | null>(null);
-
-  readonly canManageCategories = computed(() => this.authService.canAccessRole(['Admin', 'Manager']));
 
   readonly searchForm = this.formBuilder.nonNullable.group({
     search: ['']

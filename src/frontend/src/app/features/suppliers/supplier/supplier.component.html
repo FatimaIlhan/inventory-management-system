@@ -1,0 +1,200 @@
+<section class="suppliers-page" aria-label="Suppliers management">
+  <header class="page-header">
+    <div>
+      <h1>Suppliers</h1>
+      <p>Manage suppliers with searchable records and role-based CRUD operations.</p>
+    </div>
+    <div class="count-chip">
+      <strong>{{ totalCount() }}</strong>
+      <span>Total Suppliers</span>
+    </div>
+  </header>
+
+  <mat-card class="panel table-panel" appearance="outlined">
+    <div class="table-toolbar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search suppliers</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="company name" />
+      </mat-form-field>
+
+     <div class="toolbar-actions">
+  @if (canManageSuppliers()) {
+    <button
+      mat-flat-button
+      type="button"
+      class="new-button"
+      (click)="openCreateForm()">
+      New Supplier
+    </button>
+  }
+</div>
+    </div>
+
+ 
+
+    @if (isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="suppliers()" [trackBy]="trackSupplier" class="suppliers-table">
+        <ng-container matColumnDef="companyName">
+          <th mat-header-cell *matHeaderCellDef>Company Name</th>
+          <td mat-cell *matCellDef="let supplier"><strong>{{ supplier.companyName }}</strong></td>
+        </ng-container>
+
+        <ng-container matColumnDef="contactPerson">
+          <th mat-header-cell *matHeaderCellDef>Contact Person</th>
+          <td mat-cell *matCellDef="let supplier">{{ supplier.contactPerson }}</td>
+        </ng-container>
+  <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let supplier">{{ supplier.email }}</td>
+        </ng-container>
+          <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef>Phone</th>
+          <td mat-cell *matCellDef="let supplier">{{ supplier.phone }}</td>
+        </ng-container>
+          <ng-container matColumnDef="address">
+          <th mat-header-cell *matHeaderCellDef>Address</th>
+          <td mat-cell *matCellDef="let supplier">{{ supplier.address }}</td>
+        </ng-container>
+        <ng-container matColumnDef="createdAtUtc">
+          <th mat-header-cell *matHeaderCellDef>Created</th>
+          <td mat-cell *matCellDef="let supplier">{{ supplier.createdAtUtc | date: 'MMM d, y, h:mm a' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="updatedAtUtc">
+          <th mat-header-cell *matHeaderCellDef>Updated</th>
+          <td mat-cell *matCellDef="let supplier">
+            {{ supplier.updatedAtUtc ? (supplier.updatedAtUtc | date: 'MMM d, y, h:mm a') : 'Never' }}
+          </td>
+        </ng-container>
+
+        @if (canManageSuppliers()) {
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+            <td mat-cell *matCellDef="let supplier" class="actions-cell">
+              <button mat-button type="button" (click)="editSupplier(supplier)">Edit</button>
+              <button mat-button type="button" class="danger" (click)="requestDeleteSupplier(supplier)">
+                Delete
+              </button>
+            </td>
+          </ng-container>
+        }
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">No suppliers found for the current filter.</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="totalCount()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    ></mat-paginator>
+  </mat-card>
+
+  @if (isFormModalOpen()) {
+    <div class="modal-shell">
+      <button type="button" class="modal-backdrop" (click)="closeFormModal()" aria-label="Close supplier form"></button>
+      <mat-card class="modal-card" appearance="outlined">
+        <div class="modal-header">
+          <h2>{{ editingSupplierId() === null ? 'Create Supplier' : 'Edit Supplier' }}</h2>
+          <button mat-button type="button" (click)="closeFormModal()">Close</button>
+        </div>
+
+        <form [formGroup]="supplierForm" (ngSubmit)="submitAsync()" class="supplier-form" novalidate>
+          <mat-form-field appearance="outline">
+            <mat-label>Company Name</mat-label>
+            <input matInput formControlName="companyName" maxlength="100" autocomplete="off" />
+            <mat-hint align="end">{{ companyNameControl.value.length }}/100</mat-hint>
+            @if (companyNameControl.hasError('required') && companyNameControl.touched) {
+              <mat-error>Company Name is required.</mat-error>
+            }
+            @if (companyNameControl.hasError('maxlength') && companyNameControl.touched) {
+              <mat-error>Company Name must be 100 characters or less.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contact Person</mat-label>
+            <textarea matInput formControlName="contactPerson" rows="5" maxlength="500"></textarea>
+            <mat-hint align="end">{{ contactPersonControl.value.length }}/500</mat-hint>
+            @if (contactPersonControl.hasError('maxlength') && contactPersonControl.touched) {
+              <mat-error>Contact Person must be 500 characters or less.</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Phone</mat-label>
+            <input matInput formControlName="phone" maxlength="20" autocomplete="off" />
+            <mat-hint align="end">{{ phoneControl.value.length }}/20</mat-hint>
+            @if (phoneControl.hasError('maxlength') && phoneControl.touched) {
+              <mat-error>Phone must be 20 characters or less.</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" maxlength="100" autocomplete="off" />
+            <mat-hint align="end">{{ emailControl.value.length }}/100</mat-hint>
+            @if (emailControl.hasError('maxlength') && emailControl.touched) {
+              <mat-error>Email must be 100 characters or less.</mat-error>
+            }
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" rows="5" maxlength="500"></textarea>
+            <mat-hint align="end">{{ addressControl.value.length }}/500</mat-hint>
+            @if (addressControl.hasError('maxlength') && addressControl.touched) {
+              <mat-error>Address must be 500 characters or less.</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="modal-actions">
+            <button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button>
+            <button mat-flat-button type="submit" class="new-button" [disabled]="isSaving() || !canManageSuppliers()">
+              {{ isSaving() ? 'Saving...' : editingSupplierId() === null ? 'Create Supplier' : 'Update Supplier' }}
+            </button>
+          </div>
+        </form>
+      </mat-card>
+    </div>
+  }
+  @if (pendingDeleteSupplier(); as supplierToDelete) {
+    <div class="modal-shell">
+      <button type="button" class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel delete"></button>
+      <mat-card class="modal-card delete-modal" appearance="outlined">
+        <div class="modal-header">
+          <h2>Delete Supplier</h2>
+          <button mat-button type="button" class="modal-close" (click)="cancelDelete()" [disabled]="isDeleting()">Close</button>
+        </div>
+
+        <div class="delete-body">
+          <p class="delete-copy">
+            Delete supplier <strong>{{ supplierToDelete.companyName }}</strong>? This action cannot be undone.
+          </p>
+        </div>
+
+        <div class="modal-actions">
+          <button mat-stroked-button type="button" class="cancel-button" (click)="cancelDelete()" [disabled]="isDeleting()">Cancel</button>
+          <button mat-flat-button type="button" class="delete-button" (click)="confirmDeleteAsync()" [disabled]="isDeleting()">
+            {{ isDeleting() ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  }
+</section>

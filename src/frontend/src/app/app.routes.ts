@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { LoginPageComponent } from './features/auth/login-page.component';
 import { DashboardPageComponent } from './features/dashboard/dashboard-page.component';
 import { AdminUsersPageComponent } from './features/auth/admin-users-page.component';
 import { CategoriesPageComponent } from './features/categories/categories-page.component';
+import { SupplierComponent } from './features/suppliers/supplier/supplier.component';
 
 export const routes: Routes = [
 	{
@@ -43,6 +44,14 @@ export const routes: Routes = [
 				data: {
 					title: 'Categories | Inventory Management System',
 					description: 'Create, update, delete, and search product categories.'
+				}
+			},
+				{
+				path: 'suppliers',
+				component: SupplierComponent,
+				data: {
+					title: 'Suppliers | Inventory Management System',
+					description: 'Create, update, delete, and search suppliers.'
 				}
 			},
 			{

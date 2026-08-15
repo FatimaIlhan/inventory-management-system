@@ -26,7 +26,12 @@ export class MainLayoutComponent {
   private readonly router = inject(Router);
 
   readonly currentUser = computed(() => this.authService.currentUser());
-  readonly isAdmin = computed(() => this.authService.currentRole() === 'Admin');
+  readonly isAdmin = computed(() => 
+    this.authService.currentRole() === 'Admin');
+
+readonly profileRole = computed(() =>
+  this.authService.currentRole() ?? ''
+);
   readonly isSidebarCollapsed = signal(false);
   readonly isMobileSidebarOpen = signal(false);
   readonly profileName = computed(() => {
@@ -40,7 +45,7 @@ export class MainLayoutComponent {
 
   readonly masterDataNav = [
     { label: 'Categories', route: '/categories', icon: 'categories' },
-    { label: 'Suppliers', route: '/dashboard', icon: 'suppliers' },
+    { label: 'Suppliers', route: '/suppliers', icon: 'suppliers' },
     { label: 'Products', route: '/dashboard', icon: 'products' }
   ] as const;
 

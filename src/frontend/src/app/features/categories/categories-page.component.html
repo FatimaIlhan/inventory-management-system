@@ -18,15 +18,19 @@
       </mat-form-field>
 
       <div class="toolbar-actions">
-        <button mat-flat-button type="button" class="new-button" (click)="openCreateForm()" [disabled]="!canManageCategories()">
-          New Category
-        </button>
-      </div>
+  @if (canManageCategories()) {
+    <button
+      mat-flat-button
+      type="button"
+      class="new-button"
+      (click)="openCreateForm()">
+      New Category
+    </button>
+  }
+</div>
+   
     </div>
 
-    @if (!canManageCategories()) {
-      <p class="permission-note">You have view-only access for categories.</p>
-    }
 
     @if (isLoading()) {
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -59,21 +63,36 @@
             {{ category.updatedAtUtc ? (category.updatedAtUtc | date: 'MMM d, y, h:mm a') : 'Never' }}
           </td>
         </ng-container>
+        @if (canManageCategories()) {
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef class="actions-header">
+      Actions
+    </th>
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
-          <td mat-cell *matCellDef="let category" class="actions-cell">
-            <button mat-button type="button" (click)="editCategory(category)" [disabled]="!canManageCategories()">Edit</button>
-            <button mat-button type="button" class="danger" (click)="requestDeleteCategory(category)" [disabled]="!canManageCategories()">
-              Delete
-            </button>
-          </td>
-        </ng-container>
+    <td mat-cell *matCellDef="let category" class="actions-cell">
+      <button
+        mat-button
+        type="button"
+        (click)="editCategory(category)">
+        Edit
+      </button>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <button
+        mat-button
+        type="button"
+        class="danger"
+        (click)="requestDeleteCategory(category)">
+        Delete
+      </button>
+    </td>
+  </ng-container>
+}
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">No categories found for the current filter.</td>
+          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">No categories found for the current filter.</td>
         </tr>
       </table>
     </div>

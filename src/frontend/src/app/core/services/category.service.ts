@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiEnvelope } from './auth.models';
 import { Category, CategoryListQuery, CreateCategoryRequest, PagedResult, UpdateCategoryRequest } from './category.models';
-
+import { HttpErrorResponse } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private readonly httpClient = inject(HttpClient);
@@ -33,18 +33,35 @@ export class CategoryService {
   }
 
   async createAsync(request: CreateCategoryRequest): Promise<Category> {
-    const response = await firstValueFrom(
+     console.log('Creating category with request:', request);
+  console.log('POST URL:', this.apiBaseUrl);
+  try{
+        const response = await firstValueFrom(
       this.httpClient.post<ApiEnvelope<Category>>(this.apiBaseUrl, request)
     );
-
+   console.log('Create category response:', response);
     return response.data;
+  
+  }
+catch (error) {
+  console.error('Create category failed:', error);
+
+  if (error instanceof HttpErrorResponse) {
+    console.error('Status:', error.status);
+    console.error('Status text:', error.statusText);
+    console.error('URL:', error.url);
+    console.error('Response body:', error.error);
   }
 
+  throw error;
+}
+
+  }
   async updateAsync(categoryId: number, request: UpdateCategoryRequest): Promise<Category> {
     const response = await firstValueFrom(
       this.httpClient.put<ApiEnvelope<Category>>(`${this.apiBaseUrl}/${categoryId}`, request)
     );
-
+    console.log('Update category response:', response);
     return response.data;
   }
 

@@ -40,6 +40,7 @@ public sealed class CategoryService(ICategoryRepository categoryRepository, Time
 
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto createCategoryDto, CancellationToken cancellationToken)
     {
+        
         var normalizedName = CategoryValidationRules.ValidateAndNormalizeName(createCategoryDto.Name);
         var normalizedDescription = CategoryValidationRules.ValidateAndNormalizeDescription(createCategoryDto.Description);
 

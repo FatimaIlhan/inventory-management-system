@@ -46,7 +46,7 @@ readonly profileRole = computed(() =>
   readonly masterDataNav = [
     { label: 'Categories', route: '/categories', icon: 'categories' },
     { label: 'Suppliers', route: '/suppliers', icon: 'suppliers' },
-    { label: 'Products', route: '/dashboard', icon: 'products' }
+    { label: 'Products', route: '/products', icon: 'products' }
   ] as const;
 
   readonly inventoryNav = [

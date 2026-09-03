@@ -97,7 +97,11 @@ export class CategoriesPageComponent implements OnInit {
 
     try {
       let result = await this.categoryService.getPagedAsync({ page, pageSize, search });
-
+console.log('=== CATEGORY API RESPONSE ===');
+console.log('Result:', result);
+console.table(result.items);
+console.log('First category:', result.items[0]);
+console.log('updatedAtUtc:', result.items[0]?.updatedAtUtc);
       const shouldRetryEmptyResult =
         result.totalCount === 0 &&
         page === 1 &&
@@ -132,6 +136,7 @@ export class CategoriesPageComponent implements OnInit {
   }
 
   async submitAsync(): Promise<void> {
+   
     if (!this.canManageCategories()) {
       return;
     }
@@ -146,41 +151,67 @@ export class CategoriesPageComponent implements OnInit {
 
     const formValue = this.categoryForm.getRawValue();
     const payload = {
-      name: formValue.name.trim(),
-      description: formValue.description.trim() || null
+      name: (() => {
+       
+        return formValue.name.trim();
+      })(),
+      description: (() => {
+   
+        return formValue.description.trim() || null;
+      })()
     };
 
     try {
+   
       const editingId = this.editingCategoryId();
+
       if (editingId === null) {
+
         await this.categoryService.createAsync(payload);
+     
         this.snackBar.open('Category created successfully.', 'Close', { duration: 2600 });
+        
         this.pageIndex.set(0);
       } else {
-        await this.categoryService.updateAsync(editingId, payload);
+        // await this.categoryService.updateAsync(editingId, payload);
+    const updatedCategory = await this.categoryService.updateAsync(editingId, payload);
+
+console.log('Category updated successfully');
+console.log('PUT returned:', updatedCategory);
+console.log('PUT updatedAtUtc:', updatedCategory.updatedAtUtc);
         this.snackBar.open('Category updated successfully.', 'Close', { duration: 2600 });
+       
       }
 
       this.closeFormModal();
+  
       await this.loadCategoriesAsync();
+      
     } catch (error: unknown) {
       this.errorMessage.set(this.readErrorMessage(error, 'Failed to save category.'));
     } finally {
+     
       this.isSaving.set(false);
+    
     }
   }
 
   openCreateForm(): void {
+    console.log('openCreateForm called');
     if (!this.canManageCategories()) {
       return;
     }
-
+console.log('User has permission to manage categories, opening create form');
     this.editingCategoryId.set(null);
+    console.log('Resetting category form for new category creation');
     this.categoryForm.reset({ name: '', description: '' });
+    console.log('Category form reset, opening form modal');
     this.isFormModalOpen.set(true);
+    console.log('Form modal opened for category creation');
   }
 
   editCategory(category: Category): void {
+  
     if (!this.canManageCategories()) {
       return;
     }
@@ -192,11 +223,14 @@ export class CategoriesPageComponent implements OnInit {
     });
 
     this.isFormModalOpen.set(true);
+   
   }
 
   closeFormModal(): void {
+ 
     this.resetForm();
     this.isFormModalOpen.set(false);
+    
   }
 
   requestDeleteCategory(category: Category): void {

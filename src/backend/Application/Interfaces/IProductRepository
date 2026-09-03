@@ -1,0 +1,33 @@
+using Domain.Entities;
+namespace Application.Interfaces;
+public interface IProductRepository
+{
+    Task<(IReadOnlyList<Product> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? search,
+        string? sortBy,
+        bool descending,
+        CancellationToken cancellationToken);
+
+    Task<Product?> GetByIdAsync(
+        long productId,
+        CancellationToken cancellationToken);
+
+    Task<Product> CreateAsync(
+        Product product,
+        CancellationToken cancellationToken);
+
+    Task UpdateAsync(
+        Product product,
+        CancellationToken cancellationToken);
+
+    Task DeleteAsync(
+        long productId,
+        CancellationToken cancellationToken);
+
+    Task<bool> ExistsBySkuAsync(
+        string sku,
+        long? excludedProductId,
+        CancellationToken cancellationToken);
+}

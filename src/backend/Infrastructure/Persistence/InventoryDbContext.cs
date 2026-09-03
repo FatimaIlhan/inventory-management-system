@@ -9,6 +9,7 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
 	public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 	public DbSet<Category> Categories => Set<Category>();
 	public DbSet<Supplier> Suppliers => Set<Supplier>();
+	public DbSet<Product> Products => Set<Product>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

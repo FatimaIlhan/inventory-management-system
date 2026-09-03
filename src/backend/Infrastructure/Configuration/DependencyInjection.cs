@@ -42,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, IdentityAuthenticationService>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICategoryService, Application.Services.CategoryService>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductService, Application.Services.ProductService>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<ISupplierService, Application.Services.SupplierService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();

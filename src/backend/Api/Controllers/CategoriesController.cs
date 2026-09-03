@@ -24,7 +24,7 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
         return Ok(ApiResponse<PagedResultDto<CategoryDto>>.Ok(result));
     }
 
-    [HttpGet("{categoryId:long}")]
+    [HttpGet("{categoryId:long}",Name = "GetCategoryById")]
     [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult> GetByIdAsync([FromRoute] long categoryId, CancellationToken cancellationToken)
     {
@@ -45,8 +45,8 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
                 request.Description),
             cancellationToken);
 
-        return CreatedAtAction(
-            nameof(GetByIdAsync),
+        return CreatedAtRoute(
+            "GetCategoryById",
             new { categoryId = createdCategory.Id },
             ApiResponse<CategoryDto>.Ok(
                 createdCategory,

@@ -65,10 +65,10 @@ export class SupplierComponent implements OnInit {
 
   readonly supplierForm = this.formBuilder.nonNullable.group({
     companyName: ['', [Validators.required, Validators.maxLength(100)]],
-    contactPerson: ['', [Validators.maxLength(500)]],
+    contactPerson: ['', [Validators.maxLength(20)]],
     phone: ['', [Validators.maxLength(20)]],
     email: ['', [Validators.email, Validators.maxLength(100)]],
-    address: ['', [Validators.maxLength(200)]]
+    address: ['', [Validators.maxLength(20)]]
   });
   readonly searchControl = this.searchForm.controls.search;
   readonly companyNameControl = this.supplierForm.controls.companyName;

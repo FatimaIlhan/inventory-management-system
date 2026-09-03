@@ -8,6 +8,7 @@ import { DashboardPageComponent } from './features/dashboard/dashboard-page.comp
 import { AdminUsersPageComponent } from './features/auth/admin-users-page.component';
 import { CategoriesPageComponent } from './features/categories/categories-page.component';
 import { SupplierComponent } from './features/suppliers/supplier/supplier.component';
+import { ProductComponent } from './features/products/product';
 
 export const routes: Routes = [
 	{
@@ -52,6 +53,14 @@ export const routes: Routes = [
 				data: {
 					title: 'Suppliers | Inventory Management System',
 					description: 'Create, update, delete, and search suppliers.'
+				}
+			},
+			{
+				path: 'products',
+				component: ProductComponent,
+				data: {
+					title: 'Products | Inventory Management System',
+					description: 'Create, update, delete, and search products.'
 				}
 			},
 			{

@@ -43,6 +43,7 @@ public sealed class CategoryRepository(InventoryDbContext dbContext) : ICategory
 
     public async Task UpdateAsync(Category category, CancellationToken cancellationToken)
     {
+        dbContext.Categories.Update(category);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 

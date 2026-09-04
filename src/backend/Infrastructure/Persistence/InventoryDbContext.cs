@@ -10,6 +10,7 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
 	public DbSet<Category> Categories => Set<Category>();
 	public DbSet<Supplier> Suppliers => Set<Supplier>();
 	public DbSet<Product> Products => Set<Product>();
+	public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

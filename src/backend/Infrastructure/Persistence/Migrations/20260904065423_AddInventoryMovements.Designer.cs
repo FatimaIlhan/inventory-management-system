@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904065423_AddInventoryMovements")]
+    partial class AddInventoryMovements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,21 +261,21 @@ namespace Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            ConcurrencyStamp = "253a6d29-edd9-4a7d-8a1a-e8a9debf68c3",
+                            ConcurrencyStamp = "aee9cb30-b09c-423b-9373-53c01c52144a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2L,
-                            ConcurrencyStamp = "d722a810-9a7a-4cfa-a572-8b7f94d6802b",
+                            ConcurrencyStamp = "12756d8b-eaa6-47eb-95b0-939125534145",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = 3L,
-                            ConcurrencyStamp = "479ec9d3-28a7-4d6e-abab-16e1121b34dd",
+                            ConcurrencyStamp = "a60104ee-c8eb-4841-a480-e2a4d4d7bba7",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });

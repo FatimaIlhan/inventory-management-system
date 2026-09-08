@@ -124,31 +124,58 @@
           <mat-form-field appearance="outline">
             <mat-label>SKU</mat-label>
             <input matInput formControlName="sku" maxlength="50" autocomplete="off" />
+               <mat-hint align="end">{{ skuControl.value.length }}/50</mat-hint>
+              @if (skuControl.hasError('required') && skuControl.touched) {
+                <mat-error>SKU is required.</mat-error>
+              }
+              @if (skuControl.hasError('maxlength') && skuControl.touched) {
+                <mat-error>SKU must be 50 characters or less.</mat-error>
+              }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Name</mat-label>
             <input matInput formControlName="name" maxlength="100" autocomplete="off" />
+               <mat-hint align="end">{{ nameControl.value.length }}/100</mat-hint>
+              @if (nameControl.hasError('required') && nameControl.touched) {
+                <mat-error>Name is required.</mat-error>
+              }
+              @if (nameControl.hasError('maxlength') && nameControl.touched) {
+                <mat-error>Name must be 100 characters or less.</mat-error>
+              }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="wide-field">
             <mat-label>Description</mat-label>
             <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
+            <mat-hint align="end">{{ descriptionControl.value.length }}/500</mat-hint>
+            @if (descriptionControl.hasError('maxlength') && descriptionControl.touched) {
+              <mat-error>Description must be 500 characters or less.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Unit price</mat-label>
             <input matInput type="number" formControlName="unitPrice" min="0.01" step="0.01" />
+            @if (unitPriceControl.hasError('min') && unitPriceControl.touched) {
+              <mat-error>Unit price must be greater than zero.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Current stock</mat-label>
             <input matInput type="number" formControlName="currentStock" min="0" step="1" />
+            @if (currentStockControl.hasError('min') && currentStockControl.touched) {
+              <mat-error>Current stock cannot be negative.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Reorder level</mat-label>
             <input matInput type="number" formControlName="reorderLevel" min="0" step="1" />
+            @if (reorderLevelControl.hasError('min') && reorderLevelControl.touched) {
+              <mat-error>Reorder level cannot be negative.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -168,6 +195,9 @@
                 {{ category.name }}
               </mat-option>
             </mat-select>
+            @if (categoryIdControl.invalid && categoryIdControl.touched) {
+              <mat-error>Select a category.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -178,12 +208,17 @@
                 {{ supplier.companyName }}
               </mat-option>
             </mat-select>
+            @if (supplierIdControl.invalid && supplierIdControl.touched) {
+              <mat-error>Select a supplier.</mat-error>
+            }
           </mat-form-field>
         </div>
 
         <div class="modal-actions">
-          <button mat-stroked-button type="button" (click)="closeFormModal()" [disabled]="isSaving()">Cancel</button>
-          <button mat-flat-button type="submit" class="new-button" [disabled]="isSaving() || productForm.invalid">
+          <button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button>
+          <button mat-flat-button type="submit"
+           class="new-button"
+            [disabled]="isSaving() || !canManageProducts()">
             {{ isSaving() ? 'Saving...' : editingProductId() === null ? 'Create Product' : 'Update Product' }}
           </button>
         </div>

@@ -22,6 +22,7 @@ import { Product, ProductStatus, ProductListQuery } from '../../core/services/pr
 import { ProductService } from '../../core/services/product.service';
 import { Supplier } from '../../core/services/supplier.models';
 import { SupplierService } from '../../core/services/supplier.service';
+import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
   selector: 'app-product',
@@ -78,9 +79,9 @@ export class ProductComponent implements OnInit {
   });
 
   readonly productForm = this.formBuilder.nonNullable.group({
-    sku: ['', [Validators.required, Validators.maxLength(50)]],
-    name: ['', [Validators.required, Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(500)]],
+    sku: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.product.sku)]],
+    name: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.product.name)]],
+    description: ['', [Validators.maxLength(FIELD_LIMITS.product.description)]],
     unitPrice: [0, [Validators.required, Validators.min(0.01)]],
     currentStock: [0, [Validators.required, Validators.min(0)]],
     reorderLevel: [0, [Validators.required, Validators.min(0)]],
@@ -89,6 +90,14 @@ export class ProductComponent implements OnInit {
     supplierId: [0, [Validators.required, Validators.min(1)]]
   });
 
+  readonly skuControl = this.productForm.controls.sku;
+  readonly nameControl = this.productForm.controls.name;
+  readonly descriptionControl = this.productForm.controls.description;
+  readonly unitPriceControl = this.productForm.controls.unitPrice;
+  readonly currentStockControl = this.productForm.controls.currentStock;
+  readonly reorderLevelControl = this.productForm.controls.reorderLevel;
+  readonly categoryIdControl = this.productForm.controls.categoryId;
+  readonly supplierIdControl = this.productForm.controls.supplierId;
   readonly searchControl = this.searchForm.controls.search;
   readonly statusOptions = [
     { value: ProductStatus.Active, label: 'Active' },

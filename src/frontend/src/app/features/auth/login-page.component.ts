@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../core/services/auth.service';
+import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
   selector: 'app-login-page',
@@ -24,8 +25,8 @@ export class LoginPageComponent {
   readonly isPasswordVisible = signal(false);
 
   readonly loginForm = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(FIELD_LIMITS.user.email)]],
+    password: ['', [Validators.required]]
   });
 
   readonly emailControl = this.loginForm.controls.email;

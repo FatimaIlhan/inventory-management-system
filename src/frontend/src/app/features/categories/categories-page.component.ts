@@ -16,6 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ApiEnvelope } from '../../core/services/auth.models';
 import { CategoryService } from '../../core/services/category.service';
 import { Category } from '../../core/services/category.models';
+import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
   selector: 'app-categories-page',
@@ -67,8 +68,8 @@ export class CategoriesPageComponent implements OnInit {
   });
 
   readonly categoryForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(500)]]
+    name: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.category.name)]],
+    description: ['', [Validators.maxLength(FIELD_LIMITS.category.description)]]
   });
 
   readonly searchControl = this.searchForm.controls.search;

@@ -118,20 +118,23 @@
           <div class="supplier-form-grid">
             <mat-form-field appearance="outline">
               <mat-label>Company Name</mat-label>
-              <input matInput formControlName="companyName" maxlength="100" autocomplete="off" />
-              <mat-hint align="end">{{ companyNameControl.value.length }}/100</mat-hint>
+              <input matInput formControlName="companyName" maxlength="200" autocomplete="organization" />
+              <mat-hint align="end">{{ companyNameControl.value.length }}/200</mat-hint>
               @if (companyNameControl.hasError('required') && companyNameControl.touched) {
                 <mat-error>Company Name is required.</mat-error>
               }
               @if (companyNameControl.hasError('maxlength') && companyNameControl.touched) {
-                <mat-error>Company Name must be 100 characters or less.</mat-error>
+                <mat-error>Company Name must be 200 characters or less.</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Phone</mat-label>
-              <input matInput formControlName="phone" maxlength="20" autocomplete="off" />
+              <input matInput type="tel" formControlName="phone" maxlength="20" autocomplete="tel" />
               <mat-hint align="end">{{ phoneControl.value.length }}/20</mat-hint>
+              @if (phoneControl.hasError('required') && phoneControl.touched) {
+                <mat-error>Phone is required.</mat-error>
+              }
               @if (phoneControl.hasError('maxlength') && phoneControl.touched) {
                 <mat-error>Phone must be 20 characters or less.</mat-error>
               }
@@ -139,35 +142,49 @@
 
             <mat-form-field appearance="outline" class="full-width-field">
               <mat-label>Contact Person</mat-label>
-              <input matInput formControlName="contactPerson" maxlength="20" autocomplete="off" />
-              <mat-hint align="end">{{ contactPersonControl.value.length }}/20</mat-hint>
+              <input matInput formControlName="contactPerson" maxlength="100" autocomplete="name" />
+              <mat-hint align="end">{{ contactPersonControl.value.length }}/100</mat-hint>
+              @if (contactPersonControl.hasError('required') && contactPersonControl.touched) {
+                <mat-error>Contact Person is required.</mat-error>
+              }
               @if (contactPersonControl.hasError('maxlength') && contactPersonControl.touched) {
-                <mat-error>Contact Person must be 20 characters or less.</mat-error>
+                <mat-error>Contact Person must be 100 characters or less.</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Email</mat-label>
-              <input matInput formControlName="email" maxlength="100" autocomplete="off" />
-              <mat-hint align="end">{{ emailControl.value.length }}/100</mat-hint>
+              <input matInput type="email" formControlName="email" maxlength="255" autocomplete="email" />
+              <mat-hint align="end">{{ emailControl.value.length }}/255</mat-hint>
+              @if (emailControl.hasError('required') && emailControl.touched) {
+                <mat-error>Email is required.</mat-error>
+              }
+              @if (emailControl.hasError('email') && emailControl.touched) {
+                <mat-error>Enter a valid email address.</mat-error>
+              }
               @if (emailControl.hasError('maxlength') && emailControl.touched) {
-                <mat-error>Email must be 100 characters or less.</mat-error>
+                <mat-error>Email must be 255 characters or less.</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width-field">
               <mat-label>Address</mat-label>
-              <input matInput formControlName="address" maxlength="20" autocomplete="off" />
-              <mat-hint align="end">{{ addressControl.value.length }}/20</mat-hint>
+              <textarea matInput formControlName="address" rows="3" maxlength="300" autocomplete="street-address"></textarea>
+              <mat-hint align="end">{{ addressControl.value.length }}/300</mat-hint>
+              @if (addressControl.hasError('required') && addressControl.touched) {
+                <mat-error>Address is required.</mat-error>
+              }
               @if (addressControl.hasError('maxlength') && addressControl.touched) {
-                <mat-error>Address must be 20 characters or less.</mat-error>
+                <mat-error>Address must be 300 characters or less.</mat-error>
               }
             </mat-form-field>
           </div>
 
           <div class="modal-actions">
             <button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button>
-            <button mat-flat-button type="submit" class="new-button" [disabled]="isSaving() || !canManageSuppliers()">
+            <button mat-flat-button type="submit" 
+            class="new-button"
+             [disabled]="isSaving() || !canManageSuppliers()">
               {{ isSaving() ? 'Saving...' : editingSupplierId() === null ? 'Create Supplier' : 'Update Supplier' }}
             </button>
           </div>

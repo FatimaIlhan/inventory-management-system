@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../core/services/auth.service';
 import { UserRole } from '../../core/services/auth.models';
 import { ApiEnvelope } from '../../core/services/auth.models';
+import { FIELD_LIMITS, PASSWORD_COMPLEXITY_PATTERN } from '../../shared/validation/form-validation';
 
 @Component({
   selector: 'app-admin-users-page',
@@ -33,8 +34,15 @@ export class AdminUsersPageComponent {
   readonly roles: UserRole[] = ['Admin', 'Manager', 'Employee'];
 
   readonly createUserForm = this.formBuilder.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(FIELD_LIMITS.user.email)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(FIELD_LIMITS.user.password),
+        Validators.pattern(PASSWORD_COMPLEXITY_PATTERN)
+      ]
+    ],
     role: ['Employee' as UserRole, [Validators.required]]
   });
 

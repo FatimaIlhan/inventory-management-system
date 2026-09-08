@@ -16,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ApiEnvelope } from '../../../core/services/auth.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FIELD_LIMITS } from '../../../shared/validation/form-validation';
 @Component({
   selector: 'app-supplier',
   imports: [
@@ -64,11 +65,30 @@ export class SupplierComponent implements OnInit {
   });
 
   readonly supplierForm = this.formBuilder.nonNullable.group({
-    companyName: ['', [Validators.required, Validators.maxLength(100)]],
-    contactPerson: ['', [Validators.maxLength(20)]],
-    phone: ['', [Validators.maxLength(20)]],
-    email: ['', [Validators.email, Validators.maxLength(100)]],
-    address: ['', [Validators.maxLength(20)]]
+    companyName: ['',
+       [Validators.required, 
+        Validators.maxLength(FIELD_LIMITS.supplier.companyName)
+
+      
+      ]],
+    contactPerson: ['', 
+      [Validators.required,
+        Validators.maxLength(FIELD_LIMITS.supplier.contactPerson)
+
+      ]],
+    phone: ['', 
+      [Validators.required, Validators.maxLength(FIELD_LIMITS.supplier.phone)
+
+
+      ]],
+    email: ['', 
+      [Validators.required,
+        Validators.email, 
+        Validators.maxLength(FIELD_LIMITS.supplier.email)
+      ]],
+    address: ['',
+       [Validators.required,
+        Validators.maxLength(FIELD_LIMITS.supplier.address)]]
   });
   readonly searchControl = this.searchForm.controls.search;
   readonly companyNameControl = this.supplierForm.controls.companyName;

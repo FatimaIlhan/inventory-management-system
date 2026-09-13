@@ -53,6 +53,7 @@
           <mat-form-field appearance="outline"><mat-label>Movement Type</mat-label><mat-select formControlName="movementType">@for (type of movementTypes; track type.value) { <mat-option [value]="type.value">{{ type.label }}</mat-option> }</mat-select></mat-form-field>
           <mat-form-field appearance="outline"><mat-label>{{ movementTypeControl.value === 3 ? 'New stock level' : 'Quantity' }}</mat-label><input matInput type="number" min="1" step="1" formControlName="quantity" />@if (quantityControl.invalid && quantityControl.touched) { <mat-error>Enter a positive quantity.</mat-error> }<mat-hint>{{ movementTypeControl.value === 3 ? 'Sets the product stock to this level.' : 'Must be a positive quantity.' }}</mat-hint></mat-form-field>
           <mat-form-field appearance="outline"><mat-label>Reason</mat-label><textarea matInput rows="4" maxlength="500" formControlName="reason"></textarea><mat-hint align="end">{{ reasonControl.value.length }}/500</mat-hint>@if (reasonControl.hasError('required') && reasonControl.touched) { <mat-error>A reason is required.</mat-error> }</mat-form-field>
+          @if (formErrorMessage()) { <p class="form-error-message" role="alert">{{ formErrorMessage() }}</p> }
           <div class="modal-actions"><button mat-stroked-button type="button" (click)="closeFormModal()" [disabled]="isSaving()">Cancel</button><button mat-flat-button type="submit" class="record-button" [disabled]="isSaving()">{{ isSaving() ? 'Recording...' : 'Record Movement' }}</button></div>
         </form>
       </mat-card>

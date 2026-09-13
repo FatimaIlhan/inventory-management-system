@@ -100,7 +100,7 @@ public sealed class CategoryService(ICategoryRepository categoryRepository, Time
 
         if (isNameTaken)
         {
-            throw new AppValidationException("Category name must be unique.");
+            throw new AppValidationException("Category name already exist.");
         }
     }
 

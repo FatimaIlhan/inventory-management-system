@@ -7,6 +7,8 @@ namespace Api.Middleware;
 
 public sealed class GlobalExceptionMiddleware(ILogger<GlobalExceptionMiddleware> logger, IHostEnvironment hostEnvironment) : IMiddleware
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
@@ -25,12 +27,13 @@ public sealed class GlobalExceptionMiddleware(ILogger<GlobalExceptionMiddleware>
             {
                 AppValidationException validationException => (HttpStatusCode.BadRequest, validationException.Message),
                 UnauthorizedException unauthorizedException => (HttpStatusCode.Unauthorized, unauthorizedException.Message),
+                ConflictException conflictException => (HttpStatusCode.Conflict, conflictException.Message),
                 NotFoundException notFoundException => (HttpStatusCode.NotFound, notFoundException.Message),
                 _ => (HttpStatusCode.InternalServerError, "Internal server error.")
             };
 
             var response = ApiResponse<object>.Fail(message, statusCode == HttpStatusCode.InternalServerError ? errors : null);
-            var json = JsonSerializer.Serialize(response);
+            var json = JsonSerializer.Serialize(response, SerializerOptions);
 
             context.Response.StatusCode = (int)statusCode;
             context.Response.ContentType = "application/json";

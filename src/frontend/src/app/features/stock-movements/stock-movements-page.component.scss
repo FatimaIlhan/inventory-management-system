@@ -29,5 +29,6 @@
 .modal-card { position: relative; width: min(620px, 92vw); padding: 1rem 1.2rem 1.1rem; border: 1px solid #cbd9e8; border-radius: 8px; background: #f9fbfd; }
 .modal-header h2 { margin: 0; color: #0e3d77; font-size: 1.45rem; letter-spacing: 0; }
 .movement-form { display: grid; gap: .75rem; margin-top: 1rem; }
+.form-error-message { margin: 0; border: 1px solid #f3b7b7; border-left: 4px solid #d32f2f; border-radius: 8px; background: #fff6f6; color: #b42318; font-size: .84rem; font-weight: 700; line-height: 1.45; padding: .7rem .85rem; }
 .modal-actions { justify-content: flex-end; padding-top: .35rem; }
 @media (max-width: 720px) { .page-header, .table-toolbar { align-items: stretch; flex-direction: column; } .count-chip { text-align: left; } .search-field { width: 100%; } }

@@ -59,6 +59,7 @@ export class CategoriesPageComponent implements OnInit {
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly formErrorMessage = signal<string | null>(null);
   readonly editingCategoryId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
   readonly pendingDeleteCategory = signal<Category | null>(null);
@@ -68,7 +69,9 @@ export class CategoriesPageComponent implements OnInit {
   });
 
   readonly categoryForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.category.name)]],
+    name: ['', [Validators.required, 
+      Validators.pattern(/^[\p{L} .'-]+$/u),
+      Validators.maxLength(FIELD_LIMITS.category.name)]],
     description: ['', [Validators.maxLength(FIELD_LIMITS.category.description)]]
   });
 
@@ -148,7 +151,7 @@ console.log('updatedAtUtc:', result.items[0]?.updatedAtUtc);
     }
 
     this.isSaving.set(true);
-    this.errorMessage.set(null);
+    this.formErrorMessage.set(null);
 
     const formValue = this.categoryForm.getRawValue();
     const payload = {
@@ -189,7 +192,7 @@ console.log('PUT updatedAtUtc:', updatedCategory.updatedAtUtc);
       await this.loadCategoriesAsync();
       
     } catch (error: unknown) {
-      this.errorMessage.set(this.readErrorMessage(error, 'Failed to save category.'));
+      this.formErrorMessage.set(this.readErrorMessage(error, 'Failed to save category.'));
     } finally {
      
       this.isSaving.set(false);
@@ -206,6 +209,7 @@ console.log('User has permission to manage categories, opening create form');
     this.editingCategoryId.set(null);
     console.log('Resetting category form for new category creation');
     this.categoryForm.reset({ name: '', description: '' });
+    this.formErrorMessage.set(null);
     console.log('Category form reset, opening form modal');
     this.isFormModalOpen.set(true);
     console.log('Form modal opened for category creation');
@@ -218,6 +222,7 @@ console.log('User has permission to manage categories, opening create form');
     }
 
     this.editingCategoryId.set(category.id);
+    this.formErrorMessage.set(null);
     this.categoryForm.setValue({
       name: category.name,
       description: category.description ?? ''
@@ -291,6 +296,7 @@ console.log('User has permission to manage categories, opening create form');
   private resetForm(): void {
     this.editingCategoryId.set(null);
     this.categoryForm.reset({ name: '', description: '' });
+    this.formErrorMessage.set(null);
   }
 
   private readErrorMessage(error: unknown, fallbackMessage: string): string {

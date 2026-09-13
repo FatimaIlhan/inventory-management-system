@@ -56,6 +56,7 @@ export class SupplierComponent implements OnInit {
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly formErrorMessage = signal<string | null>(null);
   readonly editingSupplierId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
   readonly pendingDeleteSupplier = signal<Supplier | null>(null);
@@ -73,11 +74,14 @@ export class SupplierComponent implements OnInit {
       ]],
     contactPerson: ['', 
       [Validators.required,
-        Validators.maxLength(FIELD_LIMITS.supplier.contactPerson)
+        Validators.maxLength(FIELD_LIMITS.supplier.contactPerson),
+         Validators.pattern(/^[\p{L} .'-]+$/u)
 
       ]],
     phone: ['', 
-      [Validators.required, Validators.maxLength(FIELD_LIMITS.supplier.phone)
+      [Validators.required, 
+        Validators.maxLength(FIELD_LIMITS.supplier.phone),
+          Validators.pattern(/^\+?[0-9\s()-]+$/)
 
 
       ]],
@@ -165,7 +169,7 @@ async submitAsync(): Promise<void> {
     }
 
     this.isSaving.set(true);
-    this.errorMessage.set(null);
+    this.formErrorMessage.set(null);
 
     const formValue = this.supplierForm.getRawValue();
     const payload = {
@@ -190,7 +194,7 @@ async submitAsync(): Promise<void> {
       this.closeFormModal();
       await this.loadSuppliersAsync();
     } catch (error: unknown) {
-      this.errorMessage.set(this.readErrorMessage(error, 'Failed to save supplier.'));
+      this.formErrorMessage.set(this.readErrorMessage(error, 'Failed to save supplier.'));
     } finally {
       this.isSaving.set(false);
     }
@@ -203,6 +207,7 @@ async submitAsync(): Promise<void> {
 
     this.editingSupplierId.set(null);
     this.supplierForm.reset({ companyName: '', contactPerson: '', phone: '', email: '', address: '' });
+    this.formErrorMessage.set(null);
     this.isFormModalOpen.set(true);
   }
 
@@ -212,6 +217,7 @@ async submitAsync(): Promise<void> {
     }
 
     this.editingSupplierId.set(supplier.supplierId);
+    this.formErrorMessage.set(null);
     this.supplierForm.setValue({
       companyName: supplier.companyName,
       contactPerson: supplier.contactPerson ?? '',
@@ -285,6 +291,7 @@ async submitAsync(): Promise<void> {
   private resetForm(): void {
     this.editingSupplierId.set(null);
     this.supplierForm.reset({ companyName: '', contactPerson: '', phone: '', email: '', address: '' });
+    this.formErrorMessage.set(null);
   }
 
    private readErrorMessage(error: unknown, fallbackMessage: string): string {

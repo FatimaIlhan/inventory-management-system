@@ -63,6 +63,7 @@ export class StockMovementsPageComponent implements OnInit {
   readonly isSaving = signal(false);
   readonly isFormModalOpen = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly formErrorMessage = signal<string | null>(null);
 
   readonly searchForm = this.formBuilder.nonNullable.group({ search: [''] });
   readonly movementForm = this.formBuilder.nonNullable.group({
@@ -140,6 +141,7 @@ export class StockMovementsPageComponent implements OnInit {
       return;
     }
 
+    this.formErrorMessage.set(null);
     this.movementForm.reset({
       productId: 0,
       movementType: StockMovementType.StockIn,
@@ -151,6 +153,7 @@ export class StockMovementsPageComponent implements OnInit {
 
   closeFormModal(): void {
     if (!this.isSaving()) {
+      this.formErrorMessage.set(null);
       this.isFormModalOpen.set(false);
     }
   }
@@ -166,7 +169,7 @@ export class StockMovementsPageComponent implements OnInit {
     }
 
     this.isSaving.set(true);
-    this.errorMessage.set(null);
+    this.formErrorMessage.set(null);
     const value = this.movementForm.getRawValue();
 
     try {
@@ -181,7 +184,7 @@ export class StockMovementsPageComponent implements OnInit {
       this.pageIndex.set(0);
       await this.loadMovementsAsync();
     } catch (error: unknown) {
-      this.errorMessage.set(this.readErrorMessage(error, 'Failed to record stock movement.'));
+      this.formErrorMessage.set(this.readErrorMessage(error, 'Failed to record stock movement.'));
     } finally {
       this.isSaving.set(false);
     }

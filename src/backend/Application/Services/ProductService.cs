@@ -138,7 +138,7 @@ public  class ProductService(
 
         if (isSkuTaken)
         {
-            throw new ConflictException("Product SKU must be unique.");
+            throw new ConflictException("Product SKU already exist.");
         }
     }
 

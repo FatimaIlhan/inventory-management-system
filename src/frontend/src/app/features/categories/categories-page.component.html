@@ -138,6 +138,10 @@
             }
           </mat-form-field>
 
+          @if (formErrorMessage()) {
+            <p class="form-error-message" role="alert">{{ formErrorMessage() }}</p>
+          }
+
           <div class="modal-actions">
             <button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button>
             <button mat-flat-button type="submit" class="new-button" [disabled]="isSaving() || !canManageCategories()">

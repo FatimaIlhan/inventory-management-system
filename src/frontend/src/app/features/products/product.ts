@@ -69,6 +69,7 @@ export class ProductComponent implements OnInit {
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly formErrorMessage = signal<string | null>(null);
   readonly editingProductId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
   readonly categories = signal<Category[]>([]);
@@ -79,8 +80,11 @@ export class ProductComponent implements OnInit {
   });
 
   readonly productForm = this.formBuilder.nonNullable.group({
-    sku: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.product.sku)]],
-    name: ['', [Validators.required, Validators.maxLength(FIELD_LIMITS.product.name)]],
+    sku: ['', [Validators.required, 
+      Validators.maxLength(FIELD_LIMITS.product.sku)]],
+    name: ['', [Validators.required,
+        Validators.pattern(/^[\p{L} .'-]+$/u),
+       Validators.maxLength(FIELD_LIMITS.product.name)]],
     description: ['', [Validators.maxLength(FIELD_LIMITS.product.description)]],
     unitPrice: [0, [Validators.required, Validators.min(0.01)]],
     currentStock: [0, [Validators.required, Validators.min(0)]],
@@ -177,7 +181,7 @@ export class ProductComponent implements OnInit {
     }
 
     this.isSaving.set(true);
-    this.errorMessage.set(null);
+    this.formErrorMessage.set(null);
 
     const formValue = this.productForm.getRawValue();
     const payload = {
@@ -207,7 +211,7 @@ export class ProductComponent implements OnInit {
       this.closeFormModal();
       await this.loadProductsAsync();
     } catch (error: unknown) {
-      this.errorMessage.set(this.readErrorMessage(error, 'Failed to save product.'));
+      this.formErrorMessage.set(this.readErrorMessage(error, 'Failed to save product.'));
     } finally {
       this.isSaving.set(false);
     }
@@ -220,6 +224,7 @@ export class ProductComponent implements OnInit {
 
     this.editingProductId.set(null);
     this.resetForm();
+    this.formErrorMessage.set(null);
     this.isFormModalOpen.set(true);
   }
 
@@ -229,6 +234,7 @@ export class ProductComponent implements OnInit {
     }
 
     this.editingProductId.set(product.productId);
+    this.formErrorMessage.set(null);
     this.productForm.setValue({
       sku: product.sku,
       name: product.name,
@@ -290,6 +296,7 @@ export class ProductComponent implements OnInit {
 
   resetForm(): void {
     this.editingProductId.set(null);
+    this.formErrorMessage.set(null);
     this.productForm.reset({
       sku: '',
       name: '',

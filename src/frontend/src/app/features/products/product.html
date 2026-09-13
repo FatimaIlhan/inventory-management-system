@@ -214,6 +214,8 @@
           </mat-form-field>
         </div>
 
+        <p *ngIf="formErrorMessage()" class="form-error-message" role="alert">{{ formErrorMessage() }}</p>
+
         <div class="modal-actions">
           <button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button>
           <button mat-flat-button type="submit"

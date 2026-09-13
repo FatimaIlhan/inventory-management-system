@@ -8,6 +8,7 @@ public sealed class InventoryMovement
 	public long ProductId { get; set; }
     public Product Product { get; set; } = null!;
     public User PerformedByUser { get; set; } = null!;
+	public long PerformedByUserId { get; set; }
 	public StockMovementType MovementType { get; set; }
 	public int Quantity { get; set; }
 	public int PreviousStock { get; set; }

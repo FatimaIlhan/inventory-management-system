@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public sealed class CategoryRepository(InventoryDbContext dbContext) : ICategoryRepository
+public  class CategoryRepository(InventoryDbContext dbContext) : ICategoryRepository
 {
     public async Task<(IReadOnlyList<Category> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? search, CancellationToken cancellationToken)
     {
@@ -22,7 +22,7 @@ public sealed class CategoryRepository(InventoryDbContext dbContext) : ICategory
 
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
-            .OrderBy(category => category.Name)
+            .OrderByDescending(category => category.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

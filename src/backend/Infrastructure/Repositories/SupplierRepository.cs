@@ -31,7 +31,7 @@ public sealed class SupplierRepository(InventoryDbContext dbContext) : ISupplier
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
-            .OrderBy(supplier => supplier.CompanyName)
+            .OrderByDescending(supplier => supplier.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

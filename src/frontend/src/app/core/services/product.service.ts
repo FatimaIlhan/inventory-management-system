@@ -24,6 +24,8 @@ export class ProductService {
         categoryId: query.categoryId != null ? String(query.categoryId) : '',
         supplierId: query.supplierId != null ? String(query.supplierId) : '',
         status: query.status != null ? String(query.status) : '',
+        sortBy: query.sortBy ?? '',
+        descending: String(query.descending ?? false),
         _ts: String(Date.now())
       }
     });

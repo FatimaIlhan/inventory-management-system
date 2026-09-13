@@ -37,3 +37,6 @@ pnpm-debug.log*
 # Local git commit templates
 .gitmessage.txt
 .gitmessage*
+
+# Local Copilot instructions
+.github/copilot-instructions.md

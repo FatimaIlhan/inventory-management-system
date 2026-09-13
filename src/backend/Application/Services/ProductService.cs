@@ -7,7 +7,7 @@ using Domain.Enums;
 
 namespace Application.Services;
 
-public sealed class ProductService(
+public  class ProductService(
     IProductRepository productRepository,
     TimeProvider timeProvider) : IProductService
 {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public sealed class ProductRepository(
+public  class ProductRepository(
     InventoryDbContext dbContext) : IProductRepository
 {
     public async Task<(IReadOnlyList<Product> Items, int TotalCount)> GetPagedAsync(
@@ -59,6 +59,7 @@ public sealed class ProductRepository(
         };
 
         var items = await query
+        .OrderByDescending(product => product.CreatedAtUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

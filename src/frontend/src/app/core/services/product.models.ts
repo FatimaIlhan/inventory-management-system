@@ -30,6 +30,8 @@ export interface ProductListQuery {
     categoryId?: number;
     supplierId?: number;
     status?: ProductStatus;
+    sortBy?: string;
+    descending?: boolean;
 }
 export interface CreateProductRequest {
     sku: string;

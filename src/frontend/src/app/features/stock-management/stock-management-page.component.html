@@ -1,0 +1,38 @@
+<section class="stock-management-page" aria-label="Stock management">
+  <header class="page-header">
+    <div>
+      <h1>Stock Management</h1>
+      <p>Monitor on-hand inventory, prioritize replenishment, and keep product availability under control.</p>
+    </div>
+    <button mat-flat-button type="button" class="record-button" (click)="recordMovement()">Record Movement</button>
+  </header>
+
+  <section class="metrics-grid" aria-label="Stock status summary">
+    <article class="metric-card total"><span>On-hand units</span><strong>{{ totalUnits() | number: '1.0-2' }}</strong><small>Across {{ activeProducts().length }} active products</small></article>
+    <article class="metric-card danger"><span>Out of stock</span><strong>{{ outOfStockCount() }}</strong><small>Items unavailable for fulfilment</small></article>
+    <article class="metric-card warning"><span>Reorder required</span><strong>{{ lowStockCount() }}</strong><small>At or below the reorder level</small></article>
+    <article class="metric-card good"><span>Healthy stock</span><strong>{{ availableCount() }}</strong><small>Above the reorder level</small></article>
+  </section>
+
+  <mat-card class="panel" appearance="outlined">
+    <div class="panel-header"><div><h2>Stock Position</h2><p>Active products are ordered from lowest to highest stock.</p></div></div>
+    <div class="toolbar">
+      <mat-form-field appearance="outline" class="search-field"><mat-label>Search products</mat-label><input matInput [formControl]="searchControl" placeholder="SKU or product name" /></mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field"><mat-label>Stock status</mat-label><mat-select [formControl]="stockFilterControl"><mat-option value="all">All active products</mat-option><mat-option value="attention">Reorder required</mat-option><mat-option value="out-of-stock">Out of stock</mat-option><mat-option value="available">In stock</mat-option></mat-select></mat-form-field>
+    </div>
+    @if (isLoading()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+    @if (errorMessage()) { <p class="error-message">{{ errorMessage() }}</p> }
+    <div class="table-wrap">
+      <table mat-table [dataSource]="filteredProducts()" [trackBy]="trackProduct" class="stock-table">
+        <ng-container matColumnDef="product"><th mat-header-cell *matHeaderCellDef>Product</th><td mat-cell *matCellDef="let product"><strong>{{ product.name }}</strong><small>{{ product.sku }}</small></td></ng-container>
+        <ng-container matColumnDef="currentStock"><th mat-header-cell *matHeaderCellDef>On Hand</th><td mat-cell *matCellDef="let product"><strong>{{ product.currentStock | number: '1.0-2' }}</strong></td></ng-container>
+        <ng-container matColumnDef="reorderLevel"><th mat-header-cell *matHeaderCellDef>Reorder Level</th><td mat-cell *matCellDef="let product">{{ product.reorderLevel | number: '1.0-2' }}</td></ng-container>
+        <ng-container matColumnDef="shortfall"><th mat-header-cell *matHeaderCellDef>Reorder Gap</th><td mat-cell *matCellDef="let product">{{ getStockGap(product) > 0 ? (getStockGap(product) | number: '1.0-2') : '—' }}</td></ng-container>
+        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let product"><span class="status-badge" [class.danger]="product.currentStock === 0" [class.warning]="product.currentStock > 0 && isLowStock(product)" [class.good]="!isLowStock(product)">{{ getStatusLabel(product) }}</span></td></ng-container>
+        <ng-container matColumnDef="action"><th mat-header-cell *matHeaderCellDef class="action-header">Action</th><td mat-cell *matCellDef="let product" class="action-cell"><button mat-button type="button" (click)="recordMovement()">Adjust stock</button></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">No active products match the selected stock status.</td></tr>
+      </table>
+    </div>
+  </mat-card>
+</section>

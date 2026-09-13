@@ -50,8 +50,8 @@ readonly profileRole = computed(() =>
   ] as const;
 
   readonly inventoryNav = [
-    { label: 'Stock Management', route: '/dashboard', icon: 'stock' },
-    { label: 'Stock Movements', route: '/dashboard', icon: 'movement' }
+    { label: 'Stock Management', route: '/stock-management', icon: 'stock' },
+    { label: 'Stock Movements', route: '/stock-movements', icon: 'movement' }
   ] as const;
 
   readonly purchaseNav = [{ label: 'Purchase Orders', route: '/dashboard', icon: 'purchase' }] as const;

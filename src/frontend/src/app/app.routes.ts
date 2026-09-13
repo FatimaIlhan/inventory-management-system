@@ -9,6 +9,8 @@ import { AdminUsersPageComponent } from './features/auth/admin-users-page.compon
 import { CategoriesPageComponent } from './features/categories/categories-page.component';
 import { SupplierComponent } from './features/suppliers/supplier/supplier.component';
 import { ProductComponent } from './features/products/product';
+import { StockMovementsPageComponent } from './features/stock-movements/stock-movements-page.component';
+import { StockManagementPageComponent } from './features/stock-management/stock-management-page.component';
 
 export const routes: Routes = [
 	{
@@ -61,6 +63,22 @@ export const routes: Routes = [
 				data: {
 					title: 'Products | Inventory Management System',
 					description: 'Create, update, delete, and search products.'
+				}
+			},
+			{
+				path: 'stock-management',
+				component: StockManagementPageComponent,
+				data: {
+					title: 'Stock Management | Inventory Management System',
+					description: 'Monitor on-hand inventory and replenishment status.'
+				}
+			},
+			{
+				path: 'stock-movements',
+				component: StockMovementsPageComponent,
+				data: {
+					title: 'Stock Movements | Inventory Management System',
+					description: 'Record and audit all inventory stock changes.'
 				}
 			},
 			{

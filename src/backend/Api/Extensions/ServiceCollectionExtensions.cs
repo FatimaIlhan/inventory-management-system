@@ -1,5 +1,7 @@
 using System.Text;
 using Api.Middleware;
+using Api.Services;
+using Application.Interfaces;
 using Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -42,6 +44,8 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<GlobalExceptionMiddleware>();
         services.AddHealthChecks();
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         return services;
     }

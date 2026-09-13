@@ -46,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<IProductService, Application.Services.ProductService>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<ISupplierService, Application.Services.SupplierService>();
+        services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+        services.AddScoped<IInventoryMovementService, Application.Services.InventoryMovementService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         services.AddSingleton(TimeProvider.System);

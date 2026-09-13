@@ -17,7 +17,11 @@ public class InventoryMovementRepository : IInventoryMovementRepository
          await dbContext.InventoryMovements.AddAsync(inventoryMovement, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return inventoryMovement;
+        return await dbContext.InventoryMovements
+            .Include(inventoryMovement => inventoryMovement.Product)
+            .Include(inventoryMovement => inventoryMovement.PerformedByUser)
+            .AsNoTracking()
+            .SingleAsync(movement => movement.InventoryMovementId == inventoryMovement.InventoryMovementId, cancellationToken);
     }
 
     public async Task<InventoryMovement?> GetByIdAsync(long inventoryMovementId, CancellationToken cancellationToken)

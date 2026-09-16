@@ -1,0 +1,25 @@
+:host { display: block; }
+
+.audit-logs-page { display: grid; gap: .75rem; color: #18365c; font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; }
+.page-header, .filter-toolbar { display: flex; align-items: center; gap: .75rem; }
+.page-header { justify-content: space-between; align-items: flex-start; }
+.page-header h1 { margin: 0; color: #0f2c51; font-size: 1.8rem; letter-spacing: 0; }
+.page-header p { margin: .35rem 0 0; color: #587192; font-size: .82rem; }
+.count-chip { min-width: 9rem; padding: .5rem .8rem; border: 1px solid #d7e4f5; border-radius: 8px; background: #f4f9ff; text-align: right; }
+.count-chip strong { display: block; color: #0f3e8a; font-size: 1.35rem; }
+.count-chip span, .audit-table .mat-mdc-header-cell { color: #6881a1; font-size: .72rem; font-weight: 800; letter-spacing: 0; text-transform: uppercase; }
+.panel { border-color: #dce8f5; border-radius: 8px; background: #fff; }
+.table-panel { display: grid; gap: .7rem; padding: .8rem .8rem .5rem; }
+.filter-toolbar { flex-wrap: wrap; }
+.filter-toolbar mat-form-field { width: 10.5rem; }
+.filter-toolbar .search-field { width: min(300px, 100%); }
+.table-wrap { overflow-x: auto; border: 1px solid #e5edf8; border-radius: 8px; }
+.audit-table { width: 100%; min-width: 900px; background: #fff; }
+.audit-table .mat-mdc-header-row { background: #edf5ff; }
+.audit-table .mat-mdc-header-cell, .audit-table .mat-mdc-cell { padding: .72rem .8rem; border-bottom-color: #edf3fb; }
+.audit-table .mat-mdc-cell { color: #1d3b61; font-size: .82rem; }
+.audit-table .mat-mdc-row:hover { background: #f4f9ff; }
+.action-badge { display: inline-block; padding: .18rem .45rem; border-radius: 6px; background: #e5f0ff; color: #14539b; font-size: .72rem; font-weight: 700; }
+.error-message { margin: 0; color: #c62828; font-size: .79rem; font-weight: 600; }
+.empty-state { padding: 1.2rem; color: #6f86a4; text-align: center; font-weight: 600; }
+@media (max-width: 720px) { .page-header, .filter-toolbar { align-items: stretch; flex-direction: column; } .count-chip { text-align: left; } .filter-toolbar mat-form-field, .filter-toolbar .search-field { width: 100%; } }

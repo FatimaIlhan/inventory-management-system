@@ -38,6 +38,16 @@ public sealed class IdentityAuthenticationService(
             throw new UnauthorizedException("Invalid email or password.");
         }
 
+        await dbContext.AuditLogs.AddAsync(new AuditLog
+        {
+            UserId = user.Id,
+            EntityType = "Authentication",
+            Action = "Login",
+            Description = $"User {user.Email} signed in.",
+            CreatedAtUtc = timeProvider.GetUtcNow().UtcDateTime
+        }, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
         var roleName = await ResolvePrimaryRoleAsync(user);
         return await IssueTokensAsync(user, roleName, cancellationToken);
     }

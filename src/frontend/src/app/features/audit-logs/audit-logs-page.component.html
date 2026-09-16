@@ -1,0 +1,31 @@
+<section class="audit-logs-page" aria-label="Audit logs">
+  <header class="page-header">
+    <div><h1>Audit Logs</h1><p>Complete history of authentication and inventory activity.</p></div>
+    <div class="count-chip"><strong>{{ totalCount() }}</strong><span>Total Events</span></div>
+  </header>
+
+  <mat-card class="panel table-panel" appearance="outlined">
+    <form [formGroup]="filterForm" class="filter-toolbar">
+      <mat-form-field appearance="outline" class="search-field"><mat-label>Search audit history</mat-label><input matInput formControlName="search" placeholder="User or event detail" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Area</mat-label><mat-select formControlName="entityType"><mat-option value="">All areas</mat-option>@for (entityType of entityTypes; track entityType) { <mat-option [value]="entityType">{{ entityType }}</mat-option> }</mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Action</mat-label><mat-select formControlName="action"><mat-option value="">All actions</mat-option>@for (action of actions; track action) { <mat-option [value]="action">{{ action }}</mat-option> }</mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>From</mat-label><input matInput type="date" formControlName="fromDate" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>To</mat-label><input matInput type="date" formControlName="toDate" /></mat-form-field>
+      <button mat-stroked-button type="button" (click)="clearFilters()">Clear</button>
+    </form>
+
+    @if (isLoading()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+    @if (errorMessage()) { <p class="error-message" role="alert">{{ errorMessage() }}</p> }
+
+    <div class="table-wrap"><table mat-table [dataSource]="auditLogs()" [trackBy]="trackAuditLog" class="audit-table">
+      <ng-container matColumnDef="createdAtUtc"><th mat-header-cell *matHeaderCellDef>Recorded</th><td mat-cell *matCellDef="let auditLog">{{ auditLog.createdAtUtc | date: 'MMM d, y, h:mm a' }}</td></ng-container>
+      <ng-container matColumnDef="userEmail"><th mat-header-cell *matHeaderCellDef>User</th><td mat-cell *matCellDef="let auditLog">{{ auditLog.userEmail || ('User #' + auditLog.userId) }}</td></ng-container>
+      <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Area</th><td mat-cell *matCellDef="let auditLog">{{ auditLog.entityType }}</td></ng-container>
+      <ng-container matColumnDef="action"><th mat-header-cell *matHeaderCellDef>Action</th><td mat-cell *matCellDef="let auditLog"><span class="action-badge">{{ auditLog.action }}</span></td></ng-container>
+      <ng-container matColumnDef="description"><th mat-header-cell *matHeaderCellDef>Detail</th><td mat-cell *matCellDef="let auditLog">{{ auditLog.description }}</td></ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">No audit events match the current filters.</td></tr>
+    </table></div>
+    <mat-paginator [length]="totalCount()" [pageIndex]="pageIndex()" [pageSize]="pageSize()" [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+  </mat-card>
+</section>

@@ -6,7 +6,10 @@ using Domain.Entities;
 
 namespace Application.Services;
 
-public sealed class CategoryService(ICategoryRepository categoryRepository, TimeProvider timeProvider) : ICategoryService
+public sealed class CategoryService(
+    ICategoryRepository categoryRepository,
+    IAuditLogService auditLogService,
+    TimeProvider timeProvider) : ICategoryService
 {
     public async Task<PagedResultDto<CategoryDto>> GetPagedAsync(
         int page,
@@ -58,6 +61,9 @@ public sealed class CategoryService(ICategoryRepository categoryRepository, Time
 
         var createdCategory = await categoryRepository.CreateAsync(entity, cancellationToken);
 
+        await auditLogService.RecordAsync("Category", createdCategory.CategoryId, "Created",
+            $"Created category {createdCategory.Name}.", cancellationToken);
+
         return ToDto(createdCategory);
     }
 
@@ -80,6 +86,9 @@ public sealed class CategoryService(ICategoryRepository categoryRepository, Time
 
         await categoryRepository.UpdateAsync(category, cancellationToken);
 
+        await auditLogService.RecordAsync("Category", category.CategoryId, "Updated",
+            $"Updated category {category.Name}.", cancellationToken);
+
         return ToDto(category);
     }
 
@@ -92,6 +101,9 @@ public sealed class CategoryService(ICategoryRepository categoryRepository, Time
         }
 
         await categoryRepository.DeleteAsync(categoryId, cancellationToken);
+
+        await auditLogService.RecordAsync("Category", categoryId, "Deleted",
+            $"Deleted category {category.Name}.", cancellationToken);
     }
 
     private async Task EnsureNameIsUniqueAsync(string name, long? excludedCategoryId, CancellationToken cancellationToken)

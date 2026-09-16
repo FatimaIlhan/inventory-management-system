@@ -11,7 +11,9 @@ public sealed class InventoryDbContext(DbContextOptions<InventoryDbContext> opti
 	public DbSet<Supplier> Suppliers => Set<Supplier>();
 	public DbSet<Product> Products => Set<Product>();
 	public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
-
+	public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+   public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+   public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);

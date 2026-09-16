@@ -9,6 +9,7 @@ namespace Application.Services;
 
 public  class ProductService(
     IProductRepository productRepository,
+    IAuditLogService auditLogService,
     TimeProvider timeProvider) : IProductService
 {
     public async Task<PagedResultDto<ProductDto>> GetPagedAsync(
@@ -82,6 +83,9 @@ public  class ProductService(
 
         var createdProduct = await productRepository.CreateAsync(product, cancellationToken);
 
+        await auditLogService.RecordAsync("Product", createdProduct.ProductId, "Created",
+            $"Created product {createdProduct.Name} ({createdProduct.Sku}).", cancellationToken);
+
         return ToDto(createdProduct);
     }
 
@@ -117,6 +121,9 @@ public  class ProductService(
 
         await productRepository.UpdateAsync(product, cancellationToken);
 
+        await auditLogService.RecordAsync("Product", product.ProductId, "Updated",
+            $"Updated product {product.Name} ({product.Sku}).", cancellationToken);
+
         return ToDto(product);
     }
 
@@ -130,6 +137,9 @@ public  class ProductService(
         }
 
         await productRepository.DeleteAsync(productId, cancellationToken);
+
+        await auditLogService.RecordAsync("Product", productId, "Deleted",
+            $"Deleted product {product.Name} ({product.Sku}).", cancellationToken);
     }
 
     private async Task EnsureSkuIsUniqueAsync(string sku, long? excludedProductId, CancellationToken cancellationToken)

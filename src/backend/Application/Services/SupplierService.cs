@@ -7,6 +7,7 @@ namespace Application.Services;
 
 public sealed class SupplierService(
     ISupplierRepository supplierRepository,
+    IAuditLogService auditLogService,
     TimeProvider timeProvider) : ISupplierService
 {
     
@@ -94,6 +95,9 @@ public async Task<SupplierDto> CreateAsync(
         supplier,
         cancellationToken);
 
+    await auditLogService.RecordAsync("Supplier", createdSupplier.SupplierId, "Created",
+        $"Created supplier {createdSupplier.CompanyName}.", cancellationToken);
+
     return ToDto(createdSupplier);
 }
 private async Task EnsureCompanyNameIsUniqueAsync(
@@ -165,6 +169,9 @@ public async Task<SupplierDto> UpdateAsync(
         supplier,
         cancellationToken);
 
+    await auditLogService.RecordAsync("Supplier", supplier.SupplierId, "Updated",
+        $"Updated supplier {supplier.CompanyName}.", cancellationToken);
+
     return ToDto(supplier);
 }
 
@@ -184,6 +191,9 @@ public async Task DeleteAsync(
     await supplierRepository.DeleteAsync(
         supplierId,
         cancellationToken);
+
+    await auditLogService.RecordAsync("Supplier", supplierId, "Deleted",
+        $"Deleted supplier {supplier.CompanyName}.", cancellationToken);
 }
 private static SupplierDto ToDto(Supplier supplier) =>
     new(

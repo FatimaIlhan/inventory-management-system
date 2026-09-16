@@ -10,7 +10,7 @@ public class InventoryMovementService(
     IInventoryMovementRepository inventoryMovementRepository,
     IProductRepository productRepository,
     ICurrentUserService currentUserService,
-  
+    IAuditLogService auditLogService,
     TimeProvider timeProvider) : IInventoryMovementService
 {
     public async Task<InventoryMovementDto> CreateAsync(
@@ -73,6 +73,9 @@ if (newStock < 0)
 var createdMovement = await inventoryMovementRepository.CreateAsync(
     inventoryMovement,
     cancellationToken);
+
+        await auditLogService.RecordAsync("StockMovement", createdMovement.InventoryMovementId, "Created",
+            $"Recorded {createdMovement.MovementType} of {createdMovement.Quantity} for product {createdMovement.Product.Name}.", cancellationToken);
 
         return ToDto(createdMovement);
     }

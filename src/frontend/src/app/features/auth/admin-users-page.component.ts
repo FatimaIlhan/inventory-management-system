@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../core/services/auth.service';
 import { UserRole } from '../../core/services/auth.models';
 import { ApiEnvelope } from '../../core/services/auth.models';
+import { NotificationService } from '../../shared/services/notification.service';
 import { FIELD_LIMITS, PASSWORD_COMPLEXITY_PATTERN } from '../../shared/validation/form-validation';
 
 @Component({
@@ -28,6 +29,7 @@ import { FIELD_LIMITS, PASSWORD_COMPLEXITY_PATTERN } from '../../shared/validati
 export class AdminUsersPageComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly notificationService = inject(NotificationService);
 
   readonly isSubmitting = signal(false);
   readonly resultMessage = signal<string | null>(null);
@@ -65,6 +67,7 @@ export class AdminUsersPageComponent {
       
       const createdUser = await this.authService.createUser(createUserRequest);
       this.resultMessage.set(`Created user ${createdUser.email} with ${createdUser.role} role.`);
+      this.notificationService.success('User created successfully.');
       this.createUserForm.patchValue({ password: '' });
     } catch (error: unknown) {
       let errorMessage = 'Failed to create user.';

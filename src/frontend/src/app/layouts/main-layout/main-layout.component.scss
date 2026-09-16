@@ -311,9 +311,12 @@
 }
 
 @media (max-width: 760px) {
+  .app-shell {
+    --topbar-height: 112px;
+  }
+
   .topbar {
-    height: auto;
-    min-height: var(--topbar-height);
+    height: var(--topbar-height);
     padding: 0.5rem 0.75rem;
     align-items: flex-start;
     flex-direction: column;

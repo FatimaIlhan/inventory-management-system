@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ApiEnvelope } from '../../core/services/auth.models';
@@ -26,6 +25,8 @@ import {
 import { PurchaseOrderService } from '../../core/services/purchase-order.service';
 import { Supplier } from '../../core/services/supplier.models';
 import { SupplierService } from '../../core/services/supplier.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
@@ -42,7 +43,6 @@ import { FIELD_LIMITS } from '../../shared/validation/form-validation';
     MatPaginatorModule,
     MatProgressBarModule,
     MatSelectModule,
-    MatSnackBarModule,
     MatTableModule
   ],
   templateUrl: './purchase-orders-page.component.html',
@@ -54,7 +54,8 @@ export class PurchaseOrdersPageComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly supplierService = inject(SupplierService);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
@@ -76,7 +77,6 @@ export class PurchaseOrdersPageComponent implements OnInit {
   readonly isTransitioning = signal(false);
   readonly editingPurchaseOrderId = signal<number | null>(null);
   readonly selectedPurchaseOrder = signal<PurchaseOrder | null>(null);
-  readonly pendingDeletePurchaseOrder = signal<PurchaseOrder | null>(null);
   readonly isFormModalOpen = signal(false);
 
   readonly filtersForm = this.formBuilder.nonNullable.group({
@@ -266,10 +266,10 @@ export class PurchaseOrdersPageComponent implements OnInit {
       if (editingId === null) {
         await this.purchaseOrderService.createAsync(request);
         this.pageIndex.set(0);
-        this.snackBar.open('Purchase order created successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Purchase order created successfully.');
       } else {
         await this.purchaseOrderService.updateAsync(editingId, request);
-        this.snackBar.open('Purchase order updated successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Purchase order updated successfully.');
       }
       this.isFormModalOpen.set(false);
       this.resetForm();
@@ -281,15 +281,25 @@ export class PurchaseOrdersPageComponent implements OnInit {
     }
   }
 
-  confirmDelete(purchaseOrder: PurchaseOrder): void {
-    if (this.canManagePurchaseOrders() && this.isDraft(purchaseOrder)) {
-      this.pendingDeletePurchaseOrder.set(purchaseOrder);
+  async confirmDelete(purchaseOrder: PurchaseOrder): Promise<void> {
+    if (!this.canManagePurchaseOrders() || !this.isDraft(purchaseOrder) || this.isDeleting()) {
+      return;
+    }
+
+    const isConfirmed = await this.confirmationService.confirm({
+      title: 'Delete Purchase Order',
+      message: `Delete draft order ${purchaseOrder.orderNumber}? This action cannot be undone.`,
+      confirmLabel: 'Delete',
+      tone: 'danger'
+    });
+
+    if (isConfirmed) {
+      await this.deletePurchaseOrderAsync(purchaseOrder);
     }
   }
 
-  async deletePurchaseOrderAsync(): Promise<void> {
-    const purchaseOrder = this.pendingDeletePurchaseOrder();
-    if (purchaseOrder === null || !this.isDraft(purchaseOrder)) {
+  private async deletePurchaseOrderAsync(purchaseOrder: PurchaseOrder): Promise<void> {
+    if (!this.isDraft(purchaseOrder)) {
       return;
     }
 
@@ -297,8 +307,7 @@ export class PurchaseOrdersPageComponent implements OnInit {
     this.errorMessage.set(null);
     try {
       await this.purchaseOrderService.deleteAsync(purchaseOrder.purchaseOrderId);
-      this.pendingDeletePurchaseOrder.set(null);
-      this.snackBar.open('Purchase order deleted successfully.', 'Close', { duration: 2600 });
+      this.notificationService.success('Purchase order deleted successfully.');
       if (this.purchaseOrders().length === 1 && this.pageIndex() > 0) {
         this.pageIndex.update((pageIndex) => pageIndex - 1);
       }
@@ -324,6 +333,17 @@ export class PurchaseOrdersPageComponent implements OnInit {
 
   async receivePurchaseOrderAsync(purchaseOrder: PurchaseOrder): Promise<void> {
     if (!this.canManagePurchaseOrders() || !this.isSubmitted(purchaseOrder)) {
+      return;
+    }
+
+    const isConfirmed = await this.confirmationService.confirm({
+      title: 'Receive Purchase Order',
+      message: `Receive ${purchaseOrder.orderNumber}? Product stock will be updated.`,
+      confirmLabel: 'Receive order',
+      tone: 'primary'
+    });
+
+    if (!isConfirmed) {
       return;
     }
 
@@ -367,7 +387,7 @@ export class PurchaseOrdersPageComponent implements OnInit {
         this.selectedPurchaseOrder.set(updatedPurchaseOrder);
       }
 
-      this.snackBar.open(successMessage, 'Close', { duration: 3200 });
+      this.notificationService.success(successMessage);
     } catch (error: unknown) {
       this.errorMessage.set(this.readErrorMessage(error, failureMessage));
     } finally {

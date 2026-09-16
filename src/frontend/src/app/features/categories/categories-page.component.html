@@ -92,7 +92,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">No categories found for the current filter.</td>
+          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">{{ isLoading() ? 'Loading categories...' : searchControl.value.trim() ? 'No categories match your search.' : 'No categories have been created yet.' }}</td>
         </tr>
       </table>
     </div>
@@ -153,29 +153,4 @@
     </div>
   }
 
-  @if (pendingDeleteCategory(); as categoryToDelete) {
-    <div class="modal-shell">
-      <button type="button" class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel delete"></button>
-      <mat-card class="modal-card delete-modal" appearance="outlined">
-        <div class="modal-header">
-          <h2>Delete Category</h2>
-          <button mat-button type="button" class="modal-close" (click)="cancelDelete()" [disabled]="isDeleting()">Close</button>
-        </div>
-
-        <div class="delete-body">
-          <p class="delete-copy">
-            Delete category <strong>{{ categoryToDelete.name }}</strong>? This action cannot be undone.
-          </p>
-          <p class="delete-subcopy">All products linked to this category may be impacted.</p>
-        </div>
-
-        <div class="modal-actions">
-          <button mat-stroked-button type="button" class="cancel-button" (click)="cancelDelete()" [disabled]="isDeleting()">Cancel</button>
-          <button mat-flat-button type="button" class="delete-button" (click)="confirmDeleteAsync()" [disabled]="isDeleting()">
-            {{ isDeleting() ? 'Deleting...' : 'Delete' }}
-          </button>
-        </div>
-      </mat-card>
-    </div>
-  }
 </section>

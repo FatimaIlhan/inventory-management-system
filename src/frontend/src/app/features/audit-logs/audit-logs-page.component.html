@@ -24,7 +24,7 @@
       <ng-container matColumnDef="action"><th mat-header-cell *matHeaderCellDef>Action</th><td mat-cell *matCellDef="let auditLog"><span class="action-badge">{{ auditLog.action }}</span></td></ng-container>
       <ng-container matColumnDef="description"><th mat-header-cell *matHeaderCellDef>Detail</th><td mat-cell *matCellDef="let auditLog">{{ auditLog.description }}</td></ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">No audit events match the current filters.</td></tr>
+      <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">{{ isLoading() ? 'Loading audit history...' : filterForm.dirty ? 'No audit events match the current filters.' : 'No audit events have been recorded yet.' }}</td></tr>
     </table></div>
     <mat-paginator [length]="totalCount()" [pageIndex]="pageIndex()" [pageSize]="pageSize()" [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
   </mat-card>

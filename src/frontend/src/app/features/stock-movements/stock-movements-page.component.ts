@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ApiEnvelope } from '../../core/services/auth.models';
@@ -22,6 +21,8 @@ import {
 import { InventoryMovementService } from '../../core/services/inventory-movement.service';
 import { Product, ProductStatus } from '../../core/services/product.models';
 import { ProductService } from '../../core/services/product.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-stock-movements-page',
@@ -37,7 +38,6 @@ import { ProductService } from '../../core/services/product.service';
     MatPaginatorModule,
     MatProgressBarModule,
     MatSelectModule,
-    MatSnackBarModule,
     MatTableModule
   ],
   templateUrl: './stock-movements-page.component.html',
@@ -48,7 +48,8 @@ export class StockMovementsPageComponent implements OnInit {
   private readonly inventoryMovementService = inject(InventoryMovementService);
   private readonly productService = inject(ProductService);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
@@ -168,9 +169,24 @@ export class StockMovementsPageComponent implements OnInit {
       return;
     }
 
+    const value = this.movementForm.getRawValue();
+
+    if (value.movementType !== StockMovementType.StockIn) {
+      const movementLabel = value.movementType === StockMovementType.StockOut ? 'stock out' : 'stock adjustment';
+      const isConfirmed = await this.confirmationService.confirm({
+        title: 'Confirm Stock Change',
+        message: `Record a ${movementLabel} of ${value.quantity} for the selected product?`,
+        confirmLabel: 'Record change',
+        tone: 'primary'
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+    }
+
     this.isSaving.set(true);
     this.formErrorMessage.set(null);
-    const value = this.movementForm.getRawValue();
 
     try {
       await this.inventoryMovementService.createAsync({
@@ -179,7 +195,7 @@ export class StockMovementsPageComponent implements OnInit {
         quantity: Number(value.quantity),
         reason: value.reason.trim()
       });
-      this.snackBar.open('Stock movement recorded successfully.', 'Close', { duration: 2600 });
+      this.notificationService.success('Stock movement recorded successfully.');
       this.isFormModalOpen.set(false);
       this.pageIndex.set(0);
       await this.loadMovementsAsync();

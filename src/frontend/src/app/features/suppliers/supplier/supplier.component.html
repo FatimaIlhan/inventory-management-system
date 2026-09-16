@@ -90,7 +90,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">No suppliers found for the current filter.</td>
+          <td class="mat-cell empty-state" [attr.colspan]="displayedColumns().length">{{ isLoading() ? 'Loading suppliers...' : searchControl.value.trim() ? 'No suppliers match your search.' : 'No suppliers have been added yet.' }}</td>
         </tr>
       </table>
     </div>
@@ -193,30 +193,6 @@
             </button>
           </div>
         </form>
-      </mat-card>
-    </div>
-  }
-  @if (pendingDeleteSupplier(); as supplierToDelete) {
-    <div class="modal-shell">
-      <button type="button" class="modal-backdrop" (click)="cancelDelete()" aria-label="Cancel delete"></button>
-      <mat-card class="modal-card delete-modal" appearance="outlined">
-        <div class="modal-header">
-          <h2>Delete Supplier</h2>
-          <button mat-button type="button" class="modal-close" (click)="cancelDelete()" [disabled]="isDeleting()">Close</button>
-        </div>
-
-        <div class="delete-body">
-          <p class="delete-copy">
-            Delete supplier <strong>{{ supplierToDelete.companyName }}</strong>? This action cannot be undone.
-          </p>
-        </div>
-
-        <div class="modal-actions">
-          <button mat-stroked-button type="button" class="cancel-button" (click)="cancelDelete()" [disabled]="isDeleting()">Cancel</button>
-          <button mat-flat-button type="button" class="delete-button" (click)="confirmDeleteAsync()" [disabled]="isDeleting()">
-            {{ isDeleting() ? 'Deleting...' : 'Delete' }}
-          </button>
-        </div>
       </mat-card>
     </div>
   }

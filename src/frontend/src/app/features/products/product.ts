@@ -11,7 +11,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -22,6 +21,8 @@ import { Product, ProductStatus, ProductListQuery } from '../../core/services/pr
 import { ProductService } from '../../core/services/product.service';
 import { Supplier } from '../../core/services/supplier.models';
 import { SupplierService } from '../../core/services/supplier.service';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
@@ -37,7 +38,6 @@ import { FIELD_LIMITS } from '../../shared/validation/form-validation';
     MatTableModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatSnackBarModule,
     MatSelectModule,
     DatePipe
   ],
@@ -50,7 +50,8 @@ export class ProductComponent implements OnInit {
   private readonly categoryService = inject(CategoryService);
   private readonly supplierService = inject(SupplierService);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
@@ -201,11 +202,11 @@ export class ProductComponent implements OnInit {
 
       if (editingId === null) {
         await this.productService.createAsync(payload);
-        this.snackBar.open('Product created successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Product created successfully.');
         this.pageIndex.set(0);
       } else {
         await this.productService.updateAsync(editingId, payload);
-        this.snackBar.open('Product updated successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Product updated successfully.');
       }
 
       this.closeFormModal();
@@ -254,8 +255,19 @@ export class ProductComponent implements OnInit {
     this.resetForm();
   }
 
-  async deleteProductAsync(productId: number): Promise<void> {
+  async deleteProductAsync(product: Product): Promise<void> {
     if (!this.canManageProducts()) {
+      return;
+    }
+
+    const isConfirmed = await this.confirmationService.confirm({
+      title: 'Delete Product',
+      message: `Delete ${product.name}? This action cannot be undone.`,
+      confirmLabel: 'Delete',
+      tone: 'danger'
+    });
+
+    if (!isConfirmed) {
       return;
     }
 
@@ -263,8 +275,8 @@ export class ProductComponent implements OnInit {
     this.errorMessage.set(null);
 
     try {
-      await this.productService.deleteAsync(productId);
-      this.snackBar.open('Product deleted successfully.', 'Close', { duration: 2600 });
+      await this.productService.deleteAsync(product.productId);
+      this.notificationService.success('Product deleted successfully.');
 
       const nextPageIndex = this.pageIndex();
       const currentItems = this.products();

@@ -2,7 +2,6 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { SupplierService } from '../../../core/services/supplier.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +15,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ApiEnvelope } from '../../../core/services/auth.models';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ConfirmationService } from '../../../shared/services/confirmation.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { FIELD_LIMITS } from '../../../shared/validation/form-validation';
 @Component({
   selector: 'app-supplier',
@@ -28,8 +29,7 @@ import { FIELD_LIMITS } from '../../../shared/validation/form-validation';
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatProgressBarModule,
-    MatSnackBarModule],
+    MatProgressBarModule],
   templateUrl: './supplier.component.html',
   styleUrl: './supplier.component.scss',
 })
@@ -37,7 +37,8 @@ export class SupplierComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly supplierService = inject(SupplierService);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
@@ -59,7 +60,6 @@ export class SupplierComponent implements OnInit {
   readonly formErrorMessage = signal<string | null>(null);
   readonly editingSupplierId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
-  readonly pendingDeleteSupplier = signal<Supplier | null>(null);
 
   readonly searchForm = this.formBuilder.nonNullable.group({
     search: ['']
@@ -184,11 +184,11 @@ async submitAsync(): Promise<void> {
       const editingId = this.editingSupplierId();
       if (editingId === null) {
         await this.supplierService.createAsync(payload);
-        this.snackBar.open('Supplier created successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Supplier created successfully.');
         this.pageIndex.set(0);
       } else {
         await this.supplierService.updateAsync(editingId, payload);
-        this.snackBar.open('Supplier updated successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Supplier updated successfully.');
       }
 
       this.closeFormModal();
@@ -234,25 +234,27 @@ async submitAsync(): Promise<void> {
     this.isFormModalOpen.set(false);
   }
 
-  requestDeleteSupplier(supplier: Supplier): void {
+  async requestDeleteSupplier(supplier: Supplier): Promise<void> {
+    if (!this.canManageSuppliers() || this.isDeleting()) {
+      return;
+    }
+
+    const isConfirmed = await this.confirmationService.confirm({
+      title: 'Delete Supplier',
+      message: `Delete ${supplier.companyName}? This action cannot be undone.`,
+      confirmLabel: 'Delete',
+      tone: 'danger'
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    await this.deleteSupplierAsync(supplier);
+  }
+
+  private async deleteSupplierAsync(supplier: Supplier): Promise<void> {
     if (!this.canManageSuppliers()) {
-      return;
-    }
-
-    this.pendingDeleteSupplier.set(supplier);
-  }
-
-  cancelDelete(): void {
-    if (this.isDeleting()) {
-      return;
-    }
-
-    this.pendingDeleteSupplier.set(null);
-  }
-
-  async confirmDeleteAsync(): Promise<void> {
-    const supplier = this.pendingDeleteSupplier();
-    if (!supplier || !this.canManageSuppliers()) {
       return;
     }
 
@@ -261,8 +263,7 @@ async submitAsync(): Promise<void> {
 
     try {
       await this.supplierService.deleteAsync(supplier.supplierId);
-      this.snackBar.open('Supplier deleted successfully.', 'Close', { duration: 2600 });
-      this.pendingDeleteSupplier.set(null);
+      this.notificationService.success('Supplier deleted successfully.');
 
       const nextPageIndex = this.pageIndex();
       const currentItems = this.suppliers();

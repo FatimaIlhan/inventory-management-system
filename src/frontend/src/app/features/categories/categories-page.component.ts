@@ -9,13 +9,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiEnvelope } from '../../core/services/auth.models';
 import { CategoryService } from '../../core/services/category.service';
 import { Category } from '../../core/services/category.models';
+import { ConfirmationService } from '../../shared/services/confirmation.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { FIELD_LIMITS } from '../../shared/validation/form-validation';
 
 @Component({
@@ -30,8 +31,7 @@ import { FIELD_LIMITS } from '../../shared/validation/form-validation';
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatProgressBarModule,
-    MatSnackBarModule
+    MatProgressBarModule
   ],
   templateUrl: './categories-page.component.html',
   styleUrl: './categories-page.component.scss'
@@ -40,7 +40,8 @@ export class CategoriesPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly categoryService = inject(CategoryService);
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private loadRequestSequence = 0;
 
@@ -62,7 +63,6 @@ export class CategoriesPageComponent implements OnInit {
   readonly formErrorMessage = signal<string | null>(null);
   readonly editingCategoryId = signal<number | null>(null);
   readonly isFormModalOpen = signal(false);
-  readonly pendingDeleteCategory = signal<Category | null>(null);
 
   readonly searchForm = this.formBuilder.nonNullable.group({
     search: ['']
@@ -101,11 +101,6 @@ export class CategoriesPageComponent implements OnInit {
 
     try {
       let result = await this.categoryService.getPagedAsync({ page, pageSize, search });
-console.log('=== CATEGORY API RESPONSE ===');
-console.log('Result:', result);
-console.table(result.items);
-console.log('First category:', result.items[0]);
-console.log('updatedAtUtc:', result.items[0]?.updatedAtUtc);
       const shouldRetryEmptyResult =
         result.totalCount === 0 &&
         page === 1 &&
@@ -173,17 +168,13 @@ console.log('updatedAtUtc:', result.items[0]?.updatedAtUtc);
 
         await this.categoryService.createAsync(payload);
      
-        this.snackBar.open('Category created successfully.', 'Close', { duration: 2600 });
+        this.notificationService.success('Category created successfully.');
         
         this.pageIndex.set(0);
       } else {
         // await this.categoryService.updateAsync(editingId, payload);
-    const updatedCategory = await this.categoryService.updateAsync(editingId, payload);
-
-console.log('Category updated successfully');
-console.log('PUT returned:', updatedCategory);
-console.log('PUT updatedAtUtc:', updatedCategory.updatedAtUtc);
-        this.snackBar.open('Category updated successfully.', 'Close', { duration: 2600 });
+        await this.categoryService.updateAsync(editingId, payload);
+        this.notificationService.success('Category updated successfully.');
        
       }
 
@@ -201,18 +192,13 @@ console.log('PUT updatedAtUtc:', updatedCategory.updatedAtUtc);
   }
 
   openCreateForm(): void {
-    console.log('openCreateForm called');
     if (!this.canManageCategories()) {
       return;
     }
-console.log('User has permission to manage categories, opening create form');
     this.editingCategoryId.set(null);
-    console.log('Resetting category form for new category creation');
     this.categoryForm.reset({ name: '', description: '' });
     this.formErrorMessage.set(null);
-    console.log('Category form reset, opening form modal');
     this.isFormModalOpen.set(true);
-    console.log('Form modal opened for category creation');
   }
 
   editCategory(category: Category): void {
@@ -239,25 +225,27 @@ console.log('User has permission to manage categories, opening create form');
     
   }
 
-  requestDeleteCategory(category: Category): void {
+  async requestDeleteCategory(category: Category): Promise<void> {
+    if (!this.canManageCategories() || this.isDeleting()) {
+      return;
+    }
+
+    const isConfirmed = await this.confirmationService.confirm({
+      title: 'Delete Category',
+      message: `Delete ${category.name}? This action cannot be undone and may affect linked products.`,
+      confirmLabel: 'Delete',
+      tone: 'danger'
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    await this.deleteCategoryAsync(category);
+  }
+
+  private async deleteCategoryAsync(category: Category): Promise<void> {
     if (!this.canManageCategories()) {
-      return;
-    }
-
-    this.pendingDeleteCategory.set(category);
-  }
-
-  cancelDelete(): void {
-    if (this.isDeleting()) {
-      return;
-    }
-
-    this.pendingDeleteCategory.set(null);
-  }
-
-  async confirmDeleteAsync(): Promise<void> {
-    const category = this.pendingDeleteCategory();
-    if (!category || !this.canManageCategories()) {
       return;
     }
 
@@ -266,8 +254,7 @@ console.log('User has permission to manage categories, opening create form');
 
     try {
       await this.categoryService.deleteAsync(category.id);
-      this.snackBar.open('Category deleted successfully.', 'Close', { duration: 2600 });
-      this.pendingDeleteCategory.set(null);
+      this.notificationService.success('Category deleted successfully.');
 
       const nextPageIndex = this.pageIndex();
       const currentItems = this.categories();

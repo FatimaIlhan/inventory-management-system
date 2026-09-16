@@ -1,18 +1,47 @@
-import { Component, computed, inject } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ChartData, ChartOptions } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+import { ApiEnvelope } from '../../core/services/auth.models';
 import { AuthService } from '../../core/services/auth.service';
+import {
+  DashboardRecentActivity,
+  DashboardSummary
+} from '../../core/services/dashboard.models';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { StockMovementType } from '../../core/services/inventory-movement.models';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [
+    DatePipe,
+    DecimalPipe,
+    ReactiveFormsModule,
+    MatButtonModule,
+    BaseChartDirective
+  ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss'
 })
-export class DashboardPageComponent {
+export class DashboardPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   readonly currentUser = computed(() => this.authService.currentUser());
+  readonly dashboard = signal<DashboardSummary | null>(null);
+  readonly isLoading = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly dateRangeForm = this.formBuilder.nonNullable.group({
+    fromUtc: [this.getDateInputValue(-29)],
+    toUtc: [this.getDateInputValue(0)]
+  });
   readonly displayName = computed(() => {
     const email = this.currentUser()?.email?.trim();
     if (!email || !email.includes('@')) {
@@ -27,51 +56,103 @@ export class DashboardPageComponent {
       .join(' ');
   });
 
-  readonly statCards = [
-    { title: 'Products', value: '1,248', delta: '+12.5%', trend: 'up', tone: 'blue', icon: 'box' },
-    { title: 'Categories', value: '48', delta: '+5.2%', trend: 'up', tone: 'green', icon: 'grid' },
-    { title: 'Suppliers', value: '56', delta: '+8.1%', trend: 'up', tone: 'violet', icon: 'users' },
-    { title: 'Low Stock Items', value: '23', delta: '-4.3%', trend: 'down', tone: 'amber', icon: 'alert' },
-    { title: 'Purchase Orders', value: '12', delta: '+16.7%', trend: 'up', tone: 'cyan', icon: 'cart' }
-  ] as const;
+  readonly statCards = computed(() => {
+    const summary = this.dashboard();
+    return [
+      { title: 'Products', value: summary?.totalProducts ?? 0, tone: 'blue', icon: 'box' },
+      { title: 'Categories', value: summary?.totalCategories ?? 0, tone: 'green', icon: 'grid' },
+      { title: 'Suppliers', value: summary?.totalSuppliers ?? 0, tone: 'violet', icon: 'users' },
+      { title: 'Low Stock Items', value: summary?.lowStockItemCount ?? 0, tone: 'amber', icon: 'alert' },
+      { title: 'Purchase Orders', value: summary?.totalPurchaseOrders ?? 0, tone: 'cyan', icon: 'cart' },
+      { title: 'Recent Activity', value: summary?.recentActivityCount ?? 0, tone: 'teal', icon: 'activity' }
+    ] as const;
+  });
 
-  readonly lineLabels = ['May 18', 'May 19', 'May 20', 'May 21', 'May 23', 'May 24', 'May 25'] as const;
+  readonly movementTrendData = computed<ChartData<'line'>>(() => {
+    const trends = this.dashboard()?.movementTrends ?? [];
+    return {
+      labels: trends.map((trend) => this.formatDate(trend.dateUtc)),
+      datasets: [
+        { data: trends.map((trend) => trend.stockInQuantity), label: 'Stock In', borderColor: '#16b15d', backgroundColor: '#16b15d', tension: 0.3 },
+        { data: trends.map((trend) => trend.stockOutQuantity), label: 'Stock Out', borderColor: '#e53e3e', backgroundColor: '#e53e3e', tension: 0.3 },
+        { data: trends.map((trend) => trend.adjustmentQuantity), label: 'Adjustments', borderColor: '#2f7bff', backgroundColor: '#2f7bff', tension: 0.3 }
+      ]
+    };
+  });
 
-  readonly categories = [
-    { name: 'Electronics', percent: 35, count: 435, color: '#2f7bff' },
-    { name: 'Office Supplies', percent: 25, count: 310, color: '#17b15f' },
-    { name: 'Furniture', percent: 20, count: 248, color: '#7d4ddd' },
-    { name: 'Accessories', percent: 15, count: 186, color: '#f0a51f' },
-    { name: 'Others', percent: 5, count: 69, color: '#b6c2d5' }
-  ] as const;
+  readonly inventoryByCategoryData = computed<ChartData<'doughnut'>>(() => {
+    const categories = this.dashboard()?.inventoryByCategory ?? [];
+    return {
+      labels: categories.map((category) => category.categoryName),
+      datasets: [{
+        data: categories.map((category) => category.currentStock),
+        backgroundColor: ['#2f7bff', '#17b15f', '#f0a51f', '#e05353', '#7658c9', '#43a5c9']
+      }]
+    };
+  });
 
-  readonly recentActivity = [
-    { action: 'Stock In', reference: 'SI-2024-0056', user: 'Ahmed Khan', dateTime: 'May 25, 2024 10:24 AM', type: 'in' },
-    { action: 'Stock Out', reference: 'SO-2024-0032', user: 'Fatima Ali', dateTime: 'May 25, 2024 09:15 AM', type: 'out' },
-    {
-      action: 'Purchase Order Received',
-      reference: 'PO-2024-0018',
-      user: 'Ahmed Khan',
-      dateTime: 'May 24, 2024 04:42 PM',
-      type: 'order'
-    },
-    { action: 'Product Updated', reference: 'PRD-000124', user: 'Fatima Ali', dateTime: 'May 24, 2024 11:08 AM', type: 'update' },
-    {
-      action: 'Category Created',
-      reference: 'CAT-000048',
-      user: 'Ahmed Khan',
-      dateTime: 'May 23, 2024 03:21 PM',
-      type: 'category'
+  readonly topMovingProductsData = computed<ChartData<'bar'>>(() => {
+    const products = this.dashboard()?.topMovingProducts ?? [];
+    return {
+      labels: products.map((product) => product.productName),
+      datasets: [{
+        data: products.map((product) => product.totalQuantityMoved),
+        label: 'Units moved',
+        backgroundColor: '#2f7bff',
+        borderRadius: 4
+      }]
+    };
+  });
+
+  readonly lineChartOptions: ChartOptions<'line'> = { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } };
+  readonly doughnutChartOptions: ChartOptions<'doughnut'> = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+  readonly barChartOptions: ChartOptions<'bar'> = { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { beginAtZero: true } }, plugins: { legend: { display: false } } };
+
+  ngOnInit(): void {
+    void this.loadDashboardAsync();
+  }
+
+  async loadDashboardAsync(): Promise<void> {
+    if (this.dateRangeForm.invalid) {
+      return;
     }
-  ] as const;
 
-  readonly lowStockItems = [
-    { product: 'Wireless Earbuds', sku: 'SKU-001245', currentStock: 5, reorderLevel: 10 },
-    { product: '24" Monitor', sku: 'SKU-000987', currentStock: 3, reorderLevel: 8 },
-    { product: 'Mechanical Keyboard', sku: 'SKU-001102', currentStock: 2, reorderLevel: 5 },
-    { product: 'Office Chair', sku: 'SKU-000654', currentStock: 4, reorderLevel: 6 },
-    { product: 'A4 Paper (Box)', sku: 'SKU-000321', currentStock: 6, reorderLevel: 10 }
-  ] as const;
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      const dateRange = this.dateRangeForm.getRawValue();
+      this.dashboard.set(await this.dashboardService.getSummaryAsync(dateRange));
+    } catch (error: unknown) {
+      this.errorMessage.set(this.readErrorMessage(error));
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async viewAllActivityAsync(): Promise<void> {
+    await this.router.navigate(['/stock-movements']);
+  }
+
+  async viewLowStockAsync(): Promise<void> {
+    await this.router.navigate(['/stock-management']);
+  }
+
+  getMovementLabel(movementType: StockMovementType): string {
+    return movementType === StockMovementType.StockIn
+      ? 'Stock in'
+      : movementType === StockMovementType.StockOut
+        ? 'Stock out'
+        : 'Stock adjustment';
+  }
+
+  getMovementTone(activity: DashboardRecentActivity): string {
+    return activity.movementType === StockMovementType.StockIn
+      ? 'in'
+      : activity.movementType === StockMovementType.StockOut
+        ? 'out'
+        : 'adjustment';
+  }
 
   getStatIconPath(icon: string): string {
     switch (icon) {
@@ -85,8 +166,32 @@ export class DashboardPageComponent {
         return 'M12 3 2.5 20h19zM12 9v5m0 3h.01';
       case 'cart':
         return 'M3 5h3l2.2 9.2a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 2-1.6L22 8H8m3 11a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3';
+      case 'activity':
+        return 'M3 12h4l2.5-6 4.5 12 2.5-6H21';
       default:
         return 'M4 4h16v16H4z';
     }
+  }
+
+  private getDateInputValue(daysFromToday: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromToday);
+    return date.toISOString().slice(0, 10);
+  }
+
+  private formatDate(value: string): string {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(value));
+  }
+
+  private readErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const apiError = error.error as ApiEnvelope<unknown> | null;
+      if (apiError?.message) {
+        return apiError.message;
+      }
+      return error.status === 0 ? 'Cannot reach server. Check API and proxy configuration.' : `Request failed (${error.status}).`;
+    }
+
+    return error instanceof Error && error.message.trim().length > 0 ? error.message : 'Failed to load dashboard data.';
   }
 }

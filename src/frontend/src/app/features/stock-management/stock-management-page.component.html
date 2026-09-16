@@ -31,7 +31,7 @@
         <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let product"><span class="status-badge" [class.danger]="product.currentStock === 0" [class.warning]="product.currentStock > 0 && isLowStock(product)" [class.good]="!isLowStock(product)">{{ getStatusLabel(product) }}</span></td></ng-container>
         <ng-container matColumnDef="action"><th mat-header-cell *matHeaderCellDef class="action-header">Action</th><td mat-cell *matCellDef="let product" class="action-cell"><button mat-button type="button" (click)="recordMovement()">Adjust stock</button></td></ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">No active products match the selected stock status.</td></tr>
+        <tr class="mat-row" *matNoDataRow><td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">{{ isLoading() ? 'Loading stock levels...' : searchControl.value.trim() || stockFilterControl.value !== 'all' ? 'No active products match the selected filters.' : 'No active products are available to review.' }}</td></tr>
       </table>
     </div>
   </mat-card>

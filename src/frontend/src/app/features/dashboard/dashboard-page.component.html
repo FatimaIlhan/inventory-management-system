@@ -4,11 +4,28 @@
       <h1>Dashboard</h1>
       <p>Welcome back, {{ displayName() }}! Here is what is happening with your inventory.</p>
     </div>
-    <button mat-stroked-button type="button" class="date-range">May 18, 2024 - May 25, 2024</button>
+    <form class="date-range" [formGroup]="dateRangeForm" (ngSubmit)="loadDashboardAsync()">
+      <input type="date" formControlName="fromUtc" aria-label="Dashboard start date" />
+      <span aria-hidden="true">to</span>
+      <input type="date" formControlName="toUtc" aria-label="Dashboard end date" />
+      <button mat-stroked-button type="submit" [disabled]="isLoading()">Apply</button>
+    </form>
   </header>
 
-  <section class="stats-grid" aria-label="Top metrics">
-    @for (card of statCards; track card.title) {
+  @if (errorMessage(); as error) {
+    <p class="dashboard-error" role="alert">{{ error }}</p>
+  }
+
+  <section class="stats-grid" aria-label="Top metrics" [attr.aria-busy]="isLoading()">
+    @if (isLoading()) {
+      @for (placeholder of [1, 2, 3, 4, 5, 6]; track placeholder) {
+        <article class="stat-card skeleton-card" aria-hidden="true">
+          <span class="skeleton skeleton-icon"></span>
+          <span class="skeleton-copy"><span class="skeleton skeleton-label"></span><span class="skeleton skeleton-value"></span></span>
+        </article>
+      }
+    } @else {
+      @for (card of statCards(); track card.title) {
       <article class="stat-card" [attr.data-tone]="card.tone">
         <div class="stat-icon" aria-hidden="true">
           <svg class="stat-icon-svg" viewBox="0 0 24 24">
@@ -17,45 +34,28 @@
         </div>
         <div class="stat-copy">
           <p class="stat-title">{{ card.title }}</p>
-          <p class="stat-value">{{ card.value }}</p>
-          <p class="stat-delta" [class.negative]="card.trend === 'down'">
-            {{ card.delta }} <span>from last month</span>
-          </p>
+          <p class="stat-value">{{ card.value | number }}</p>
         </div>
       </article>
+      }
     }
   </section>
 
-  <section class="analytics-grid" aria-label="Analytics charts">
+  <section class="analytics-grid" aria-label="Analytics charts" [attr.aria-busy]="isLoading()">
     <article class="panel trend-panel">
       <header class="panel-header">
         <h2>Stock Movement Trend</h2>
-        <button mat-stroked-button type="button" class="panel-range">This Month</button>
+        <span class="panel-range">Selected period</span>
       </header>
 
-      <div class="legend" role="list">
-        <span role="listitem"><i class="line line-in"></i> Stock In</span>
-        <span role="listitem"><i class="line line-out"></i> Stock Out</span>
-        <span role="listitem"><i class="line line-adjust"></i> Adjustments</span>
-      </div>
-
-      <div class="chart-wrap" aria-hidden="true">
-        <svg viewBox="0 0 640 210" preserveAspectRatio="none">
-          <line x1="28" y1="24" x2="620" y2="24" class="grid" />
-          <line x1="28" y1="70" x2="620" y2="70" class="grid" />
-          <line x1="28" y1="116" x2="620" y2="116" class="grid" />
-          <line x1="28" y1="162" x2="620" y2="162" class="grid" />
-          <polyline points="28,126 126,104 224,92 322,55 420,84 518,98 620,88" class="series in" />
-          <polyline points="28,162 126,148 224,134 322,122 420,134 518,140 620,126" class="series out" />
-          <polyline points="28,183 126,183 224,175 322,183 420,177 518,172 620,176" class="series adjust" />
-        </svg>
-
-        <div class="x-axis" role="list">
-          @for (label of lineLabels; track label) {
-            <span role="listitem">{{ label }}</span>
-          }
+      @if (isLoading()) { <div class="skeleton skeleton-chart" aria-hidden="true"></div> } @else {
+        <div class="legend" role="list">
+          <span role="listitem"><i class="line line-in"></i> Stock In</span>
+          <span role="listitem"><i class="line line-out"></i> Stock Out</span>
+          <span role="listitem"><i class="line line-adjust"></i> Adjustments</span>
         </div>
-      </div>
+        <div class="chart-wrap"><canvas baseChart type="line" [data]="movementTrendData()" [options]="lineChartOptions"></canvas></div>
+      }
     </article>
 
     <article class="panel category-panel">
@@ -63,26 +63,19 @@
         <h2>Inventory by Category</h2>
       </header>
 
-      <div class="donut-wrap">
-        <div class="donut" aria-hidden="true">
-          <div class="donut-inner">
-            <strong>1,248</strong>
-            <span>Total</span>
-          </div>
-        </div>
-
-        <div class="category-legend" role="list">
-          @for (category of categories; track category.name) {
-            <div role="listitem" class="legend-row">
-              <span class="dot" [style.background]="category.color"></span>
-              <span class="name">{{ category.name }}</span>
-              <strong>{{ category.percent }}%</strong>
-              <small>({{ category.count }})</small>
-            </div>
-          }
-        </div>
-      </div>
+      @if (isLoading()) { <div class="skeleton skeleton-chart" aria-hidden="true"></div> } @else {
+        <div class="donut-wrap"><canvas baseChart type="doughnut" [data]="inventoryByCategoryData()" [options]="doughnutChartOptions"></canvas></div>
+      }
     </article>
+  </section>
+
+  <section class="top-moving-panel panel" aria-label="Top moving products chart">
+    <header class="panel-header">
+      <h2>Top Moving Products</h2>
+    </header>
+    @if (isLoading()) { <div class="skeleton skeleton-chart" aria-hidden="true"></div> } @else {
+      <div class="bar-chart-wrap"><canvas baseChart type="bar" [data]="topMovingProductsData()" [options]="barChartOptions"></canvas></div>
+    }
   </section>
 
   <section class="tables-grid" aria-label="Operational tables">
@@ -101,24 +94,27 @@
             </tr>
           </thead>
           <tbody>
-            @for (activity of recentActivity; track activity.reference) {
+            @for (activity of dashboard()?.recentActivities ?? []; track activity.inventoryMovementId) {
               <tr>
                 <td>
                   <span class="activity-cell">
-                    <span class="activity-dot" [attr.data-type]="activity.type"></span>
-                    {{ activity.action }}
+                    <span class="activity-dot" [attr.data-type]="getMovementTone(activity)"></span>
+                    {{ getMovementLabel(activity.movementType) }}
                   </span>
                 </td>
-                <td>{{ activity.reference }}</td>
-                <td>{{ activity.user }}</td>
-                <td>{{ activity.dateTime }}</td>
+                <td>{{ activity.reason }}</td>
+                <td>{{ activity.performedByUserName }}</td>
+                <td>{{ activity.createdAtUtc | date: 'medium' }}</td>
               </tr>
+            }
+            @if ((dashboard()?.recentActivities?.length ?? 0) === 0) {
+              <tr><td colspan="4" class="empty-table-message">No stock activity was recorded during this period.</td></tr>
             }
           </tbody>
         </table>
       </div>
 
-      <button mat-button type="button" class="table-cta">View all activity</button>
+      <button mat-button type="button" class="table-cta" (click)="viewAllActivityAsync()">View all activity</button>
     </article>
 
     <article class="panel table-panel">
@@ -137,19 +133,22 @@
             </tr>
           </thead>
           <tbody>
-            @for (item of lowStockItems; track item.sku) {
+            @for (item of dashboard()?.lowStockProducts ?? []; track item.productId) {
               <tr>
-                <td>{{ item.product }}</td>
+                <td>{{ item.productName }}</td>
                 <td>{{ item.sku }}</td>
                 <td><span class="stock-danger">{{ item.currentStock }}</span></td>
                 <td>{{ item.reorderLevel }}</td>
               </tr>
             }
+            @if ((dashboard()?.lowStockProducts?.length ?? 0) === 0) {
+              <tr><td colspan="4" class="empty-table-message">No products need replenishment right now.</td></tr>
+            }
           </tbody>
         </table>
       </div>
 
-      <button mat-button type="button" class="table-cta">View all low stock items</button>
+      <button mat-button type="button" class="table-cta" (click)="viewLowStockAsync()">View all low stock items</button>
     </article>
   </section>
 </section>

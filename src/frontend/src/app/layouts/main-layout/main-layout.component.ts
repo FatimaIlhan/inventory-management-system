@@ -54,11 +54,11 @@ readonly profileRole = computed(() =>
     { label: 'Stock Movements', route: '/stock-movements', icon: 'movement' }
   ] as const;
 
-  readonly purchaseNav = [{ label: 'Purchase Orders', route: '/dashboard', icon: 'purchase' }] as const;
+  readonly purchaseNav = [{ label: 'Purchase Orders', route: '/purchase-orders', icon: 'purchase' }] as const;
 
   readonly reportNav = [
     { label: 'Reports', route: '/dashboard', icon: 'reports' },
-    { label: 'Audit Logs', route: '/dashboard', icon: 'audit' }
+    { label: 'Audit Logs', route: '/audit-logs', icon: 'audit' }
   ] as const;
 
   readonly systemNav = [

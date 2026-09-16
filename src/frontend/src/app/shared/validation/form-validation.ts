@@ -15,6 +15,9 @@ export const FIELD_LIMITS = {
     email: 255,
     address: 300
   },
+  purchaseOrder: {
+    orderNumber: 50
+  },
   user: {
     email: 256,
     password: 8

@@ -75,10 +75,20 @@ dotnet user-secrets set "Jwt:SigningKey" "replace-this-with-a-long-random-develo
 dotnet user-secrets set "SeedAdmin:Email" "admin@example.com"
 dotnet user-secrets set "SeedAdmin:Password" "Admin123"
 
+dotnet ef database update --project ../Infrastructure/Infrastructure.csproj --startup-project .
+dotnet run -- --provision-admin
 dotnet run
 ```
 
-The API runs at `http://localhost:5253`. On first startup, pending Entity Framework Core migrations are applied and the configured administrator account is created.
+The API runs at `http://localhost:5253`.
+
+On a new local database, run the commands in this order:
+
+1. `dotnet ef database update` applies the committed migrations.
+2. `dotnet run -- --provision-admin` creates the configured initial administrator if no users exist, then exits.
+3. `dotnet run` starts the API without changing the database schema or creating users.
+
+For a database that already has users, do not run `--provision-admin`; it will exit without creating an account.
 
 ### 2. Run the Angular application
 

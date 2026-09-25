@@ -57,8 +57,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+        services.AddScoped<AdminProvisioningService>();
         services.AddSingleton(TimeProvider.System);
-        services.AddHostedService<AuthSeedHostedService>();
 
         return services;
     }

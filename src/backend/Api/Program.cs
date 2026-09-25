@@ -1,5 +1,6 @@
 using Api.Extensions;
 using Api.DTOs;
+using Infrastructure.Authentication;
 using Infrastructure.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -75,6 +76,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+if (args.Contains("--provision-admin", StringComparer.Ordinal))
+{
+    using var scope = app.Services.CreateScope();
+    var provisioner = scope.ServiceProvider.GetRequiredService<AdminProvisioningService>();
+    var result = await provisioner.ProvisionAsync(app.Lifetime.ApplicationStopping);
+    app.Logger.LogInformation("Administrator provisioning completed with result {Result}.", result);
+    return;
+}
 
 app.UseApiPipeline();
 

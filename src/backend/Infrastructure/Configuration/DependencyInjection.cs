@@ -14,7 +14,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = ResolveConnectionString(configuration);
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
@@ -63,28 +63,5 @@ public static class DependencyInjection
         return services;
     }
 
-    private static string? ResolveConnectionString(IConfiguration configuration)
-    {
-        var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
-        if (!string.IsNullOrWhiteSpace(configuredConnectionString))
-        {
-            return configuredConnectionString;
-        }
 
-        var host = configuration["MySql:Host"];
-        var port = configuration["MySql:Port"] ?? "3306";
-        var database = configuration["MySql:Database"];
-        var user = configuration["MySql:User"];
-        var password = configuration["MySql:Password"];
-
-        if (string.IsNullOrWhiteSpace(host) ||
-            string.IsNullOrWhiteSpace(database) ||
-            string.IsNullOrWhiteSpace(user) ||
-            string.IsNullOrWhiteSpace(password))
-        {
-            return null;
-        }
-
-        return $"Server={host};Port={port};Database={database};User={user};Password={password};";
-    }
 }

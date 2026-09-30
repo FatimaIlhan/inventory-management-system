@@ -37,7 +37,6 @@ public static class DependencyInjection
             .AddRoles<Role>()
             .AddEntityFrameworkStores<InventoryDbContext>();
 
-        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.Configure<SeedAdminOptions>(configuration.GetSection(SeedAdminOptions.SectionName));
         services.AddScoped<IAuthenticationService, IdentityAuthenticationService>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();

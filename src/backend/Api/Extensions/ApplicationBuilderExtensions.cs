@@ -1,4 +1,6 @@
+using System.Data.Common;
 using Api.DTOs;
+using Infrastructure.Persistence;
 
 namespace Api.Extensions;
 
@@ -37,7 +39,27 @@ public static class ApplicationBuilderExtensions
         app.UseAuthorization();
 
         app.MapControllers();
-        app.MapGet("/api/health", () => Results.Ok("OK"));
+        app.MapGet("/api/health", async (
+            IServiceScopeFactory scopeFactory,
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellationToken) =>
+        {
+            try
+            {
+                await using var scope = scopeFactory.CreateAsyncScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+
+                return await dbContext.Database.CanConnectAsync(cancellationToken)
+                    ? Results.Ok("OK")
+                    : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            }
+            catch (DbException exception)
+            {
+                loggerFactory.CreateLogger("DatabaseHealth")
+                    .LogWarning(exception, "Database readiness check failed.");
+                return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            }
+        });
 
         return app;
     }

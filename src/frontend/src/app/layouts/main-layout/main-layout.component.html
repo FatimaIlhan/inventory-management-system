@@ -49,9 +49,9 @@
       </button>
 
       <mat-menu #profileMenu="matMenu" class="profile-menu" xPosition="before">
-        <button mat-menu-item type="button">My Profile</button>
+        <!-- <button mat-menu-item type="button">My Profile</button>
         <button mat-menu-item type="button">Settings</button>
-        <button mat-menu-item type="button">Change Password</button>
+        <button mat-menu-item type="button">Change Password</button> -->
         <button mat-menu-item type="button" (click)="logout()">Logout</button>
       </mat-menu>
     </div>
@@ -131,21 +131,22 @@
           }
         </section>
 
-        <section class="nav-group">
-          <h3>SYSTEM</h3>
-          @for (item of systemNav; track item.label) {
-            @if (item.label !== 'Users' || isAdmin()) {
-              <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeMobileSidebar()">
-                <span class="nav-icon" aria-hidden="true">
-                  <svg class="nav-icon-svg" viewBox="0 0 24 24">
-                    <path [attr.d]="getSidebarIconPath(item.icon)"></path>
-                  </svg>
-                </span>
-                <span class="nav-label">{{ item.label }}</span>
-              </a>
-            }
-          }
-        </section>
+        @if (isAdmin()) {
+  <section class="nav-group">
+    <h3>SYSTEM</h3>
+    @for (item of systemNav; track item.label) {
+      <a [routerLink]="item.route" routerLinkActive="active"
+         class="nav-item" (click)="closeMobileSidebar()">
+        <span class="nav-icon" aria-hidden="true">
+          <svg class="nav-icon-svg" viewBox="0 0 24 24">
+            <path [attr.d]="getSidebarIconPath(item.icon)"></path>
+          </svg>
+        </span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </section>
+}
       </div>
 
       <button mat-stroked-button type="button" class="collapse-button" (click)="toggleSidebarCollapse()">

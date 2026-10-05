@@ -63,8 +63,8 @@ readonly profileRole = computed(() =>
 
   readonly systemNav = [
     { label: 'Users', route: '/admin/users', icon: 'users' },
-    { label: 'Roles & Permissions', route: '/dashboard', icon: 'roles' },
-    { label: 'Settings', route: '/dashboard', icon: 'settings' }
+    // { label: 'Roles & Permissions', route: '/dashboard', icon: 'roles' },
+    // { label: 'Settings', route: '/dashboard', icon: 'settings' }
   ] as const;
 
   getSidebarIconPath(icon: string): string {

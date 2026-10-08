@@ -40,3 +40,5 @@ pnpm-debug.log*
 
 # Local Copilot instructions
 .github/copilot-instructions.md
+# .NET profiling traces
+*.nettrace

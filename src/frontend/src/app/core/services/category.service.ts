@@ -1,13 +1,14 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope } from './auth.models';
 import { Category, CategoryListQuery, CreateCategoryRequest, PagedResult, UpdateCategoryRequest } from './category.models';
 import { HttpErrorResponse } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/categories';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/categories`;
 
   async getPagedAsync(query: CategoryListQuery): Promise<PagedResult<Category>> {
     const params = new HttpParams({

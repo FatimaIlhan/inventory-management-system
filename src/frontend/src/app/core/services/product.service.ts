@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope } from './auth.models';
 import {
   CreateProductRequest,
@@ -13,7 +14,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/products';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/products`;
 
   async getPagedAsync(query: ProductListQuery): Promise<PagedResult<Product>> {
     const params = new HttpParams({

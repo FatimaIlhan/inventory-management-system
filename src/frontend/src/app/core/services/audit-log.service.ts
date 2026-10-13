@@ -1,13 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope } from './auth.models';
 import { AuditLogListQuery, PagedAuditLogs } from './audit-log.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuditLogService {
   private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/audit-logs';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/audit-logs`;
 
   async getPagedAsync(query: AuditLogListQuery): Promise<PagedAuditLogs> {
     const params = new HttpParams({

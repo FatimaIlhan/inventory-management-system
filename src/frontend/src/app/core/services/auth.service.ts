@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope, AuthTokens, AuthenticatedUser, CreateUserRequest, LoginRequest, UserRole } from './auth.models';
 
 @Injectable({ providedIn: 'root' })
@@ -13,7 +14,7 @@ export class AuthService {
   private readonly refreshTokenKey = 'ims_refresh_token';
   private readonly userKey = 'ims_user';
 
-  private readonly apiBaseUrl = '/api';
+  private readonly apiBaseUrl = environment.apiBaseUrl;
 
   private readonly currentUserSignal = signal<AuthenticatedUser | null>(this.readStoredUser());
 

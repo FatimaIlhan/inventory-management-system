@@ -3,11 +3,12 @@ import { inject, Injectable } from "@angular/core";
 import type { Supplier, SupplierListQuery, PagedResult, CreateSupplierRequest, UpdateSupplierRequest } from "./supplier.models";
 import { ApiEnvelope } from "./auth.models";
 import { firstValueFrom } from "rxjs/internal/firstValueFrom";
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierService {
  private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/suppliers';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/suppliers`;
 
   async getPagedAsync(query: SupplierListQuery): Promise<PagedResult<Supplier>> {
     const params = new HttpParams({

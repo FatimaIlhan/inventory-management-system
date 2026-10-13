@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope } from './auth.models';
 import {
   CreateInventoryMovementRequest,
@@ -12,7 +13,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class InventoryMovementService {
   private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/inventory-movements';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/inventory-movements`;
 
   async getPagedAsync(query: InventoryMovementListQuery): Promise<PagedInventoryMovements> {
     const params = new HttpParams({

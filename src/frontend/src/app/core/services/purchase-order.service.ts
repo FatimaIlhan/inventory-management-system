@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ApiEnvelope } from './auth.models';
 import {
   CreatePurchaseOrderRequest,
@@ -13,7 +14,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PurchaseOrderService {
   private readonly httpClient = inject(HttpClient);
-  private readonly apiBaseUrl = '/api/purchase-orders';
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/purchase-orders`;
 
   async getPagedAsync(query: PurchaseOrderListQuery): Promise<PagedPurchaseOrders> {
     const params = new HttpParams({

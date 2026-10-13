@@ -90,6 +90,31 @@ On a new local database, run the commands in this order:
 
 For a database that already has users, do not run `--provision-admin`; it will exit without creating an account.
 
+### Reset the existing administrator password
+
+The separate `--reset-admin-password` maintenance command only resets the existing
+`fatima.admin@example.com` account. It never creates or deletes users, changes roles,
+or applies migrations. Email matching ignores case and surrounding whitespace;
+the password is used exactly as supplied and must meet the existing Identity policy.
+
+Supply both process environment variables through your secure operational tooling:
+
+- `ADMIN_PASSWORD_RESET_EMAIL`: `fatima.admin@example.com`
+- `ADMIN_PASSWORD_RESET_NEW_PASSWORD`: the new password (do not put it in shell history or source control)
+
+With the existing database and JWT configuration available, run from the repository root:
+
+```powershell
+dotnet run --project .\src\backend\Api\Api.csproj --no-launch-profile -- --reset-admin-password
+```
+
+The command generates and immediately consumes an Identity reset token, then exits
+without starting the web server. Exit code `0` means success; `1` means failure.
+Logs contain only outcomes and safe error descriptions, not the password or token.
+Do not combine this command with `--provision-admin`. Clear both reset environment
+variables after use. This is an operator-invoked, one-shot command, not an HTTP
+endpoint; it can be invoked again intentionally for a future reset.
+
 ### 2. Run the Angular application
 
 Open a second terminal:

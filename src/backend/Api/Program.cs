@@ -77,6 +77,34 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+if (args.Contains("--reset-admin-password", StringComparer.Ordinal))
+{
+    if (args.Contains("--provision-admin", StringComparer.Ordinal))
+    {
+        app.Logger.LogError("Use --reset-admin-password and --provision-admin separately.");
+        Environment.ExitCode = 1;
+        return;
+    }
+
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var resetter = scope.ServiceProvider.GetRequiredService<AdminPasswordResetService>();
+        var succeeded = await resetter.ResetAsync(
+            Environment.GetEnvironmentVariable(AdminPasswordResetService.EmailEnvironmentVariable),
+            Environment.GetEnvironmentVariable(AdminPasswordResetService.PasswordEnvironmentVariable));
+        Environment.ExitCode = succeeded ? 0 : 1;
+    }
+    catch (Exception)
+    {
+        // Exception details from external providers may contain sensitive configuration or inputs.
+        app.Logger.LogError("Administrator password reset failed unexpectedly. Verify database access and Identity token-provider configuration.");
+        Environment.ExitCode = 1;
+    }
+
+    return;
+}
+
 if (args.Contains("--provision-admin", StringComparer.Ordinal))
 {
     using var scope = app.Services.CreateScope();

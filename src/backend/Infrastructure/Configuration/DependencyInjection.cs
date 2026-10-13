@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddDbContext<InventoryDbContext>(options =>
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+        services.AddDataProtection();
         services.AddIdentityCore<User>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -35,7 +36,8 @@ public static class DependencyInjection
                 options.User.RequireUniqueEmail = true;
             })
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<InventoryDbContext>();
+            .AddEntityFrameworkStores<InventoryDbContext>()
+            .AddDefaultTokenProviders();
 
         services.Configure<SeedAdminOptions>(configuration.GetSection(SeedAdminOptions.SectionName));
         services.AddScoped<IAuthenticationService, IdentityAuthenticationService>();
@@ -57,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         services.AddScoped<AdminProvisioningService>();
+        services.AddScoped<AdminPasswordResetService>();
         services.AddSingleton(TimeProvider.System);
 
         return services;

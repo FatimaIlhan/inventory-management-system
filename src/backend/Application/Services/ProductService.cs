@@ -86,7 +86,7 @@ public  class ProductService(
         await auditLogService.RecordAsync("Product", createdProduct.ProductId, "Created",
             $"Created product {createdProduct.Name} ({createdProduct.Sku}).", cancellationToken);
 
-        return ToDto(createdProduct);
+        return await GetByIdAsync(createdProduct.ProductId, cancellationToken);
     }
 
     public async Task<ProductDto> UpdateAsync(long productId, UpdateProductDto updateProductDto, CancellationToken cancellationToken)
@@ -124,7 +124,7 @@ public  class ProductService(
         await auditLogService.RecordAsync("Product", product.ProductId, "Updated",
             $"Updated product {product.Name} ({product.Sku}).", cancellationToken);
 
-        return ToDto(product);
+        return await GetByIdAsync(productId, cancellationToken);
     }
 
     public async Task DeleteAsync(long productId, CancellationToken cancellationToken)
@@ -184,6 +184,8 @@ public  class ProductService(
             product.Status,
             product.CategoryId,
             product.SupplierId,
+            product.Category.Name,
+            product.Supplier.CompanyName,
             product.CreatedAtUtc,
             product.UpdatedAtUtc);
 }

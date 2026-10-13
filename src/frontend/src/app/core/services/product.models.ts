@@ -14,6 +14,8 @@ export interface Product {
     status: ProductStatus;
     categoryId: number;
     supplierId: number;
+    categoryName: string;
+    supplierName: string;
     createdAtUtc: Date;
     updatedAtUtc?: Date;
 }

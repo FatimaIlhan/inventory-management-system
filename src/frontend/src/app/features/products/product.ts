@@ -58,8 +58,8 @@ export class ProductComponent implements OnInit {
   readonly canManageProducts = computed(() => this.authService.canAccessRole(['Admin', 'Manager']));
   readonly displayedColumns = computed<string[]>(() =>
     this.canManageProducts()
-      ? ['sku', 'name', 'unitPrice', 'currentStock', 'reorderLevel', 'status', 'categoryId', 'supplierId', 'createdAtUtc', 'updatedAtUtc', 'actions']
-      : ['sku', 'name', 'unitPrice', 'currentStock', 'reorderLevel', 'status', 'categoryId', 'supplierId', 'createdAtUtc', 'updatedAtUtc']
+      ? ['sku', 'name', 'unitPrice', 'currentStock', 'reorderLevel', 'status', 'categoryName', 'supplierName', 'createdAtUtc', 'updatedAtUtc', 'actions']
+      : ['sku', 'name', 'unitPrice', 'currentStock', 'reorderLevel', 'status', 'categoryName', 'supplierName', 'createdAtUtc', 'updatedAtUtc']
   );
 
   readonly products = signal<Product[]>([]);
@@ -84,7 +84,7 @@ export class ProductComponent implements OnInit {
     sku: ['', [Validators.required, 
       Validators.maxLength(FIELD_LIMITS.product.sku)]],
     name: ['', [Validators.required,
-        Validators.pattern(/^[\p{L} .'-]+$/u),
+        Validators.pattern(/^[\p{L}\p{N} .'-]+$/u),
        Validators.maxLength(FIELD_LIMITS.product.name)]],
     description: ['', [Validators.maxLength(FIELD_LIMITS.product.description)]],
     unitPrice: [0, [Validators.required, Validators.min(0.01)]],

@@ -12,7 +12,9 @@ public sealed class Product
     public int ReorderLevel { get; set; }
     public ProductStatus Status { get; set; }
     public long CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
     public long SupplierId { get; set; }
+    public Supplier Supplier { get; set; } = null!;
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
 }

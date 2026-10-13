@@ -53,7 +53,7 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnName("category_id")
             .IsRequired();
 
-        builder.HasOne<Category>()
+        builder.HasOne(product => product.Category)
             .WithMany()
             .HasForeignKey(product => product.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -62,7 +62,7 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasColumnName("supplier_id")
             .IsRequired();
 
-        builder.HasOne<Supplier>()
+        builder.HasOne(product => product.Supplier)
             .WithMany()
             .HasForeignKey(product => product.SupplierId)
             .OnDelete(DeleteBehavior.Restrict);

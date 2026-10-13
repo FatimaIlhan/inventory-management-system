@@ -13,5 +13,7 @@ public sealed record ProductDto(
     ProductStatus Status,
     long CategoryId,
     long SupplierId,
+    string CategoryName,
+    string SupplierName,
     DateTime CreatedAtUtc,
     DateTime? UpdatedAtUtc);

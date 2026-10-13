@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -16,7 +17,10 @@ public  class ProductRepository(
         bool descending,
         CancellationToken cancellationToken)
     {
-        var query = dbContext.Products.AsNoTracking();
+        IQueryable<Product> query = dbContext.Products
+            .AsNoTracking()
+            .Include(product => product.Category)
+            .Include(product => product.Supplier);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -73,6 +77,8 @@ public  class ProductRepository(
     {
         return await dbContext.Products
             .AsNoTracking()
+            .Include(product => product.Category)
+            .Include(product => product.Supplier)
             .FirstOrDefaultAsync(product => product.ProductId == productId, cancellationToken);
     }
 
@@ -90,7 +96,15 @@ public  class ProductRepository(
         Product product,
         CancellationToken cancellationToken)
     {
-        dbContext.Products.Update(product);
+        var existingProduct = await dbContext.Products
+            .FirstOrDefaultAsync(item => item.ProductId == product.ProductId, cancellationToken);
+
+        if (existingProduct is null)
+        {
+            throw new NotFoundException("Product was not found.");
+        }
+
+        dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 

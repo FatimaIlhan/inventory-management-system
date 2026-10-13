@@ -65,6 +65,7 @@ Use a consistent error body shape for all non-success responses:
 - Health
   - GET /api/health
 - Products
+  - Product responses include `categoryName` and `supplierName` (the supplier company name) for display, alongside `categoryId` and `supplierId`. Create and update requests still use IDs.
   - GET /api/products
   - GET /api/products/{id}
   - POST /api/products

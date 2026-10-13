@@ -8,6 +8,7 @@ uses ASP.NET Core and Angular in a Clean Architecture monorepo.
 
 - JWT authentication with role-based authorization for Admin, Manager, and Staff users.
 - Product, category, supplier, and user management.
+- Product names support letters, numbers, spaces, periods, apostrophes, and hyphens (for example, `Business Laptop 15-inch`); the products table displays category and supplier names.
 - Inventory stock-in, stock-out, and adjustment workflows.
 - Immutable inventory movement history, including the previous and resulting stock levels.
 - Purchase-order creation, submission, receiving, and cancellation workflows.

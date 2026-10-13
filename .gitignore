@@ -48,3 +48,6 @@ pnpm-debug.log*
 /api-logs.zip
 /src/backend/api-deployment.zip
 /src/backend/publish/
+
+.env
+/artifacts/

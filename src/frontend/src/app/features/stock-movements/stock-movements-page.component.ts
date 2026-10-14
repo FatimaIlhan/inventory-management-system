@@ -96,6 +96,19 @@ export class StockMovementsPageComponent implements OnInit {
     void this.loadMovementsAsync();
     void this.loadProductsAsync();
   }
+  getPerformedByDisplayName(email: string | null | undefined, userId: number): string {
+  if (!email) {
+    return `User #${userId}`;
+  }
+
+  const username = email.split('@')[0];
+
+  return username
+    .split(/[._-]+/)
+    .filter(part => part.length > 0)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
 
   async loadMovementsAsync(): Promise<void> {
     const requestId = ++this.loadRequestSequence;

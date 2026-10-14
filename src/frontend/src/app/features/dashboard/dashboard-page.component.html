@@ -103,7 +103,7 @@
                   </span>
                 </td>
                 <td>{{ activity.reason }}</td>
-                <td>{{ activity.performedByUserName }}</td>
+                <td>{{getPerformedByDisplayName(activity.performedByUserName, activity.performedByUserId) }}</td>
                 <td>{{ activity.createdAtUtc | date: 'medium' }}</td>
               </tr>
             }

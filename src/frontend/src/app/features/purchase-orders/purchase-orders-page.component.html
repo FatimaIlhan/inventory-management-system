@@ -114,11 +114,11 @@
                 <mat-form-field appearance="outline" class="product-select"><mat-label>Product</mat-label><mat-select formControlName="productId"><mat-option [value]="0" disabled>Select a product</mat-option>@for (product of products(); track product.productId) {<mat-option [value]="product.productId">{{ product.sku }} - {{ product.name }}</mat-option>}</mat-select>@if (hasItemError(index, 'productId')) {<mat-error>Select a product.</mat-error>}</mat-form-field>
                 <mat-form-field appearance="outline"><mat-label>Quantity</mat-label><input matInput type="number" formControlName="quantity" min="1" step="1" />@if (hasItemError(index, 'quantity')) {<mat-error>Enter a quantity greater than zero.</mat-error>}</mat-form-field>
                 <mat-form-field appearance="outline"><mat-label>Unit price</mat-label><input matInput type="number" formControlName="unitPrice" min="0.01" step="0.01" />@if (hasItemError(index, 'unitPrice')) {<mat-error>Enter a price greater than zero.</mat-error>}</mat-form-field>
-                <div class="line-total">{{ lineTotal(index) | currency }}</div><button mat-button type="button" class="danger remove-button" (click)="removeItem(index)" [disabled]="itemForms.length === 1">Remove</button>
+                <div class="line-total">{{ lineTotal(index) | currency:'ZAR':'R':'1.2-2':'en-ZA' }}</div><button mat-button type="button" class="danger remove-button" (click)="removeItem(index)" [disabled]="itemForms.length === 1">Remove</button>
               </div>
             }
           </div>
-          <div class="order-total">Order total: <strong>{{ orderTotal() | currency }}</strong></div>
+          <div class="order-total">Order total: <strong>{{ orderTotal() | currency:'ZAR':'R':'1.2-2':'en-ZA' }}</strong></div>
           @if (formErrorMessage()) {<p class="form-error-message" role="alert">{{ formErrorMessage() }}</p>}
           <div class="modal-actions"><button mat-stroked-button type="button" (click)="closeFormModal()">Cancel</button><button mat-flat-button type="submit" class="new-button" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : editingPurchaseOrderId() === null ? 'Create Purchase Order' : 'Update Purchase Order' }}</button></div>
         </form>

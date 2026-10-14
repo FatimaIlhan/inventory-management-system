@@ -42,7 +42,7 @@
 
         <ng-container matColumnDef="unitPrice">
           <th mat-header-cell *matHeaderCellDef>Unit Price</th>
-          <td mat-cell *matCellDef="let product">{{ product.unitPrice | currency }}</td>
+          <td mat-cell *matCellDef="let product">{{ product.unitPrice | currency:'ZAR':'R':'1.2-2':'en-ZA' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="currentStock">
